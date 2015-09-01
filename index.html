@@ -130,6 +130,12 @@ body[full="true"] #pac-input{
 // pick list containing a mix of places and predicted search terms.
 var colorArray = ['rgba(238, 200, 0, 100)', 'rgba(149, 25, 12, 100)', 'rgba(97, 3, 69, 100)', 'rgba(21, 140, 104, 100)', 'rgba(3, 74, 155, 100)'];
 function initAutocomplete() {
+  var labelScript = document.createElement('script');
+  labelScript.type = 'text/javascript';
+  labelScript.async = true;
+  labelScript.src = '../javascripts/maplabel-compiled.js';
+  document.body.appendChild(labelScript);
+
   var map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 33.682, lng: -117.890},
     zoom: 15,
@@ -167,7 +173,8 @@ function initAutocomplete() {
     searchBox.setBounds(map.getBounds());
   });
 
-  var markers = [];
+  var markers = [],
+  mapLabels = [];
   // [START region_getplaces]
   // Listen for the event fired when the user selects a prediction and retrieve
   // more details for that place.
@@ -192,7 +199,8 @@ function initAutocomplete() {
         path: google.maps.SymbolPath.CIRCLE,
         scale: 7,
         fillColor: color,
-        strokeColor: color
+        strokeColor: color,
+        anchor: new google.maps.Point(0, 2)
       };
 
       var infowindow = new google.maps.InfoWindow({
@@ -206,13 +214,23 @@ function initAutocomplete() {
         position: place.geometry.location,
         icon: icon,
         animation: google.maps.Animation.DROP
-      })
+      });
+
+      var mapLabel = new MapLabel({
+        text: place.name,
+        position: place.geometry.location,
+        map: map,
+        fontSize: 15,
+        align: 'center'
+      });
 
       marker.addListener('click', function() {
-        infowindow.open(map, marker);
+        map.setZoom(15);
+        map.setCenter(marker.getPosition());
       });
 
       markers.push(marker);
+      mapLabels.push(mapLabel);
 
       if (place.geometry.viewport) {
         // Only geocodes have viewport.
@@ -233,7 +251,8 @@ function initAutocomplete() {
       content: searchTerm + results,
       color: color,
       data: {startIndex:markers.length - places.length, endIndex: markers.length},
-      markers: markers
+      markers: markers,
+      labels: mapLabels
     });
     input.value = "";
   });
@@ -277,6 +296,10 @@ function createResult(result){
     var removedMarkers = result.markers.splice(resultElement.data.startIndex, resultElement.data.endIndex);
     removedMarkers.forEach(function(marker) {
       marker.setMap(null);
+    });
+    var removedLabels = result.labels.splice(resultElement.data.startIndex, resultElement.data.endIndex);
+    removedLabels.forEach(function(label) {
+      label.setMap(null);
     });
     resultElement.parentNode.removeChild(resultElement);
     resultElement = null;
