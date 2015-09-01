@@ -23,7 +23,30 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
+#results-wrap{
+  z-index: 1;
+  position: absolute;
+  left: 88px;
+  top: 43px;
+  max-height: 400px;
+  overflow: auto;
+}
+
+.result{
+  margin-top: 5px;
+  background-color: red;
+  color: white;
+  font-family: Roboto;
+  font-size: 15px;
+  font-weight: 300;
+  margin-left: 12px;
+  padding: 7px;
+  text-overflow: ellipsis;
+  width: 287px;
+}
+
 #pac-input {
+  top: 0px;
   background-color: #fff;
   font-family: Roboto;
   font-size: 15px;
@@ -63,7 +86,8 @@
     </style>
   </head>
   <body>
-    <input id="pac-input" class="controls" type="search" placeholder="Search Box">
+    <div id="results-wrap"></div>
+    <input id="pac-input" class="controls" type="search" placeholder="Search...">
     <div id="map"></div>
     <script>
 // This example adds a search box to a map, using the Google Place Autocomplete
@@ -120,12 +144,13 @@ function initAutocomplete() {
     }
 
     // Clear out the old markers.
-    markers.forEach(function(marker) {
-      marker.setMap(null);
-    });
-    markers = [];
+    // markers.forEach(function(marker) {
+    //   marker.setMap(null);
+    // });
+    // markers = [];
 
     // For each place, get the icon, name and location.
+    var color = getRandomColor();
     var bounds = new google.maps.LatLngBounds();
     places.forEach(function(place) {
       var icon = {
@@ -151,9 +176,34 @@ function initAutocomplete() {
       }
     });
     map.fitBounds(bounds);
+
+    // create result
+    var searchTerm = input.value;
+    createResult(searchTerm, color);
+    input.value = "";
+    input.focus();
   });
   // [END region_getplaces]
 }
+
+function getRandomColor() {
+  var letters = '0123456789ABCDEF'.split('');
+  var color = '#';
+  for (var i = 0; i < 6; i++ ) {
+      color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
+
+function createResult(resultText, color){
+  var resultsWrap = document.getElementById('results-wrap'),
+  result = document.createElement("div");
+  result.className = "result";
+  result.innerHTML = resultText;
+  result.style.background = color;
+  // Prepend it to the parent element
+  resultsWrap.insertBefore(result, resultsWrap.firstChild);
+};
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.setPosition(pos);
@@ -164,7 +214,7 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 
 
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?signed_in=true&libraries=places&callback=initAutocomplete"
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initAutocomplete"
          async defer></script>
   </body>
 </html>
