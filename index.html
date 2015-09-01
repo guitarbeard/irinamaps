@@ -28,7 +28,7 @@
   position: absolute;
   left: 88px;
   top: 43px;
-  max-height: 400px;
+  max-height: calc(100% - 43px);
   overflow: auto;
 }
 
@@ -43,6 +43,17 @@
   padding: 7px;
   text-overflow: ellipsis;
   width: 287px;
+}
+
+@media (max-width: 568px) {
+  #results-wrap{
+    left: auto;
+    right: 0px;
+  }
+
+  .result{
+    width: 125px;
+  }
 }
 
 #pac-input {
