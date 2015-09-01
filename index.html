@@ -32,9 +32,14 @@
   overflow: auto;
 }
 
+body[full="true"] #results-wrap{
+  top: 10px;
+  max-height: calc(100% - 10px);
+}
+
 .result{
   margin-top: 5px;
-  background-color: red;
+  background-color: rgb(127, 127, 127);
   color: white;
   font-family: Roboto;
   font-size: 15px;
@@ -43,12 +48,27 @@
   padding: 7px;
   text-overflow: ellipsis;
   width: 287px;
+  cursor: pointer;
+}
+
+.result:hover{
+  opacity: .8;
+}
+
+.result p{
+  margin: 0;
+  font-size: 10px;
 }
 
 @media (max-width: 568px) {
   #results-wrap{
     left: auto;
     right: 0px;
+  }
+
+  body[full="true"] #results-wrap{
+    top: 30px;
+    max-height: calc(100% - 30px);
   }
 
   .result{
@@ -70,6 +90,10 @@
 
 #pac-input:focus {
   border-color: #4d90fe;
+}
+
+body[full="true"] #pac-input{
+  display: none;
 }
 
 .pac-container {
@@ -104,7 +128,7 @@
 // This example adds a search box to a map, using the Google Place Autocomplete
 // feature. People can enter geographical searches. The search box will return a
 // pick list containing a mix of places and predicted search terms.
-
+var colorArray = ['rgba(238, 200, 0, 100)', 'rgba(149, 25, 12, 100)', 'rgba(97, 3, 69, 100)', 'rgba(21, 140, 104, 100)', 'rgba(3, 74, 155, 100)'];
 function initAutocomplete() {
   var map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 33.682, lng: -117.890},
@@ -203,38 +227,76 @@ function initAutocomplete() {
 
     // create result
     var searchTerm = input.value,
-    plural = places.length === 1 ? '' : 's';
-    createResult(searchTerm + ': ' + places.length + ' result' + plural, color);
+    results = places.length === 1 ? '' :  '<p>' + places.length +' results</p>';
+    createResult({
+      id: markers.length,
+      content: searchTerm + results,
+      color: color,
+      data: {startIndex:markers.length - places.length, endIndex: markers.length},
+      markers: markers
+    });
     input.value = "";
   });
   // [END region_getplaces]
 }
 
+function randomIntFromInterval(min,max) {
+    return Math.floor(Math.random()*(max-min+1)+min);
+}
+
 function getRandomColor() {
-  var letters = '0123456789ABCDEF'.split('');
-  var color = '#';
-  for (var i = 0; i < 6; i++ ) {
-      color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
+  // var letters = '0123456789ABCDEF'.split('');
+  // var color = '#';
+  // for (var i = 0; i < 6; i++ ) {
+  //     color += letters[Math.floor(Math.random() * 16)];
+  // }
+  var color = colorArray.splice(randomIntFromInterval(0, colorArray.length - 1), 1);
+  return color[0];
 };
 
-function createResult(resultText, color){
+function createResult(result){
   var resultsWrap = document.getElementById('results-wrap'),
-  result = document.createElement("div");
-  result.className = "result";
-  result.innerHTML = resultText;
-  result.style.background = color;
+  resultElement = document.createElement("div");
+  resultElement.id = result.id;
+  resultElement.className = "result";
+  resultElement.innerHTML = result.content;
+  resultElement.style.background = result.color;
+  resultElement.data = result.data;
+
+  function checkColorArray () {
+    if(colorArray.length === 0){
+      document.body.setAttribute('full', true);
+    }else{
+      document.body.setAttribute('full', false);
+    }
+  };
+
+  checkColorArray();
+
+  function removeResult () {
+    var removedMarkers = result.markers.splice(resultElement.data.startIndex, resultElement.data.endIndex);
+    removedMarkers.forEach(function(marker) {
+      marker.setMap(null);
+    });
+    resultElement.parentNode.removeChild(resultElement);
+    resultElement = null;
+    if(result.color !== undefined)
+      colorArray.push(result.color);
+
+    checkColorArray();
+  };
+
+  resultElement.addEventListener("click", removeResult);
+
   // Prepend it to the parent element
-  resultsWrap.insertBefore(result, resultsWrap.firstChild);
+  resultsWrap.insertBefore(resultElement, resultsWrap.firstChild);
 };
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-  infoWindow.close();
-  // infoWindow.setPosition(pos);
-  // infoWindow.setContent(browserHasGeolocation ?
-  //                       'Error: The Geolocation service failed.' :
-  //                       'Error: Your browser doesn\'t support geolocation.');
+  infoWindow.setPosition(pos);
+  infoWindow.setContent(browserHasGeolocation ?
+                        'Error: The Geolocation service failed.' :
+                        'Error: Your browser doesn\'t support geolocation.');
 }
 
 
