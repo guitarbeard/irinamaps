@@ -129,6 +129,7 @@ body[full="true"] #pac-input{
 // feature. People can enter geographical searches. The search box will return a
 // pick list containing a mix of places and predicted search terms.
 var colorArray = ['rgba(238, 200, 0, 100)', 'rgba(149, 25, 12, 100)', 'rgba(97, 3, 69, 100)', 'rgba(21, 140, 104, 100)', 'rgba(3, 74, 155, 100)'];
+
 function initAutocomplete() {
   var labelScript = document.createElement('script');
   labelScript.type = 'text/javascript';
@@ -173,8 +174,6 @@ function initAutocomplete() {
     searchBox.setBounds(map.getBounds());
   });
 
-  var markers = [],
-  mapLabels = [];
   // [START region_getplaces]
   // Listen for the event fired when the user selects a prediction and retrieve
   // more details for that place.
@@ -185,14 +184,20 @@ function initAutocomplete() {
       return;
     }
 
-    // Clear out the old markers.
-    // markers.forEach(function(marker) {
-    //   marker.setMap(null);
-    // });
-    // markers = [];
+    // create result
+    var searchTerm = input.value,
+    color = getRandomColor(),
+    results = places.length === 1 ? '' :  '<p>' + places.length +' results</p>';
+
+    var result = createResult({
+      content: searchTerm + results,
+      color: color,
+      markers: [],
+      labels: []
+    });
 
     // For each place, get the icon, name and location.
-    var color = getRandomColor();
+
     var bounds = new google.maps.LatLngBounds();
     places.forEach(function(place) {
       var icon = {
@@ -225,12 +230,12 @@ function initAutocomplete() {
       });
 
       marker.addListener('click', function() {
-        map.setZoom(15);
+        map.setZoom(17);
         map.setCenter(marker.getPosition());
       });
 
-      markers.push(marker);
-      mapLabels.push(mapLabel);
+      result.markers.push(marker);
+      result.labels.push(mapLabel);
 
       if (place.geometry.viewport) {
         // Only geocodes have viewport.
@@ -240,20 +245,9 @@ function initAutocomplete() {
       }
     });
     // zoom only on the first search
-    if(markers.length === places.length)
-     map.fitBounds(bounds);
+    if(document.getElementsByClassName('result').length === 1)
+      map.fitBounds(bounds);
 
-    // create result
-    var searchTerm = input.value,
-    results = places.length === 1 ? '' :  '<p>' + places.length +' results</p>';
-    createResult({
-      id: markers.length,
-      content: searchTerm + results,
-      color: color,
-      data: {startIndex:markers.length - places.length, endIndex: markers.length},
-      markers: markers,
-      labels: mapLabels
-    });
     input.value = "";
   });
   // [END region_getplaces]
@@ -264,11 +258,6 @@ function randomIntFromInterval(min,max) {
 }
 
 function getRandomColor() {
-  // var letters = '0123456789ABCDEF'.split('');
-  // var color = '#';
-  // for (var i = 0; i < 6; i++ ) {
-  //     color += letters[Math.floor(Math.random() * 16)];
-  // }
   var color = colorArray.splice(randomIntFromInterval(0, colorArray.length - 1), 1);
   return color[0];
 };
@@ -276,11 +265,9 @@ function getRandomColor() {
 function createResult(result){
   var resultsWrap = document.getElementById('results-wrap'),
   resultElement = document.createElement("div");
-  resultElement.id = result.id;
   resultElement.className = "result";
   resultElement.innerHTML = result.content;
   resultElement.style.background = result.color;
-  resultElement.data = result.data;
 
   function checkColorArray () {
     if(colorArray.length === 0){
@@ -293,12 +280,10 @@ function createResult(result){
   checkColorArray();
 
   function removeResult () {
-    var removedMarkers = result.markers.splice(resultElement.data.startIndex, resultElement.data.endIndex);
-    removedMarkers.forEach(function(marker) {
+    result.markers.forEach(function(marker) {
       marker.setMap(null);
     });
-    var removedLabels = result.labels.splice(resultElement.data.startIndex, resultElement.data.endIndex);
-    removedLabels.forEach(function(label) {
+    result.labels.forEach(function(label) {
       label.setMap(null);
     });
     resultElement.parentNode.removeChild(resultElement);
@@ -313,6 +298,8 @@ function createResult(result){
 
   // Prepend it to the parent element
   resultsWrap.insertBefore(resultElement, resultsWrap.firstChild);
+
+  return result;
 };
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
