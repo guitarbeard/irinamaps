@@ -96,7 +96,7 @@
 
 function initAutocomplete() {
   var map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: -34.397, lng: 150.644},
+    center: {lat: 33.682, lng: -117.890},
     zoom: 15,
     mapTypeId: google.maps.MapTypeId.ROADMAP
   });
@@ -154,19 +154,30 @@ function initAutocomplete() {
     var bounds = new google.maps.LatLngBounds();
     places.forEach(function(place) {
       var icon = {
-        url: place.icon,
-        size: new google.maps.Size(71, 71),
-        origin: new google.maps.Point(0, 0),
-        anchor: new google.maps.Point(17, 34),
-        scaledSize: new google.maps.Size(25, 25)
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 7,
+        fillColor: color,
+        strokeColor: color
       };
 
+      var infowindow = new google.maps.InfoWindow({
+        content: '<p>' + place.name + '</p>'
+      });
+
       // Create a marker for each place.
-      markers.push(new google.maps.Marker({
+      var marker = new google.maps.Marker({
         map: map,
         title: place.name,
-        position: place.geometry.location
-      }));
+        position: place.geometry.location,
+        icon: icon,
+        animation: google.maps.Animation.DROP
+      })
+
+      marker.addListener('click', function() {
+        infowindow.open(map, marker);
+      });
+
+      markers.push(marker);
 
       if (place.geometry.viewport) {
         // Only geocodes have viewport.
@@ -178,10 +189,10 @@ function initAutocomplete() {
     map.fitBounds(bounds);
 
     // create result
-    var searchTerm = input.value;
-    createResult(searchTerm, color);
+    var searchTerm = input.value,
+    plural = places.length === 1 ? '' : 's';
+    createResult(searchTerm + ': ' + places.length + ' result' + plural, color);
     input.value = "";
-    input.focus();
   });
   // [END region_getplaces]
 }
@@ -206,10 +217,11 @@ function createResult(resultText, color){
 };
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-  infoWindow.setPosition(pos);
-  infoWindow.setContent(browserHasGeolocation ?
-                        'Error: The Geolocation service failed.' :
-                        'Error: Your browser doesn\'t support geolocation.');
+  infoWindow.close();
+  // infoWindow.setPosition(pos);
+  // infoWindow.setContent(browserHasGeolocation ?
+  //                       'Error: The Geolocation service failed.' :
+  //                       'Error: Your browser doesn\'t support geolocation.');
 }
 
 
