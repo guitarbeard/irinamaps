@@ -230,7 +230,7 @@ function initAutocomplete() {
       });
 
       marker.addListener('click', function() {
-        map.setZoom(17);
+        map.setZoom(15);
         map.setCenter(marker.getPosition());
       });
 
@@ -295,6 +295,7 @@ function createResult(result){
   };
 
   resultElement.addEventListener("click", removeResult);
+  resultElement.addEventListener("touchend", removeResult);
 
   // Prepend it to the parent element
   resultsWrap.insertBefore(resultElement, resultsWrap.firstChild);
