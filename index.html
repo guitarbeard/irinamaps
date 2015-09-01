@@ -186,7 +186,9 @@ function initAutocomplete() {
         bounds.extend(place.geometry.location);
       }
     });
-    map.fitBounds(bounds);
+    // zoom only on the first search
+    if(markers.length === places.length)
+     map.fitBounds(bounds);
 
     // create result
     var searchTerm = input.value,
