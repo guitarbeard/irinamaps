@@ -130,9 +130,8 @@ function initAutocomplete() {
         bounds.extend(place.geometry.location);
       }
     });
-    // zoom only on the first search
-    if(document.getElementsByClassName('result').length === 1)
-      map.fitBounds(bounds);
+
+    map.fitBounds(bounds);
 
     input.value = "";
   });
