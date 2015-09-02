@@ -29,8 +29,6 @@ function initAutocomplete() {
     mapTypeId: google.maps.MapTypeId.ROADMAP
   });
 
-  var infoWindow = new google.maps.InfoWindow({map: map});
-
   // Try HTML5 geolocation.
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
@@ -39,20 +37,31 @@ function initAutocomplete() {
         lng: position.coords.longitude
       };
 
-      infoWindow.setPosition(pos);
-      infoWindow.setContent('You');
+      var marker = new google.maps.Marker({
+        map: map,
+        position: pos,
+        animation: google.maps.Animation.DROP,
+        zIndex: google.maps.Marker.MAX_ZINDEX + 1
+      });
+
+      marker.addListener('click', function() {
+        map.setZoom(15);
+        map.setCenter(pos);
+      });
+
       map.setCenter(pos);
     }, function() {
-      handleLocationError(true, infoWindow, map.getCenter());
+      //handleLocationError(true, infoWindow, map.getCenter());
     });
   } else {
     // Browser doesn't support Geolocation
-    handleLocationError(false, infoWindow, map.getCenter());
+    //handleLocationError(false, infoWindow, map.getCenter());
   }
 
   // Create the search box and link it to the UI element.
   var input = document.getElementById('pac-input');
   var searchBox = new google.maps.places.SearchBox(input);
+  var infowindow = new google.maps.InfoWindow();
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
   // Bias the SearchBox results towards current map's viewport.
@@ -73,13 +82,12 @@ function initAutocomplete() {
     // create result
     var searchTerm = input.value,
     color = getRandomColor(),
-    results = places.length === 1 ? '' :  '<p>' + places.length +' results</p>';
+    results = places.length === 1 ? '' :  '<div class="result-amount">' + places.length +' results</div>';
 
     var result = createResult({
-      content: searchTerm + results,
+      content: '<div class="result-text">' + searchTerm + results + '</div><button class="remove-result" type="button">×</button>',
       color: color,
-      markers: [],
-      labels: []
+      markers: []
     });
 
     // For each place, get the icon, name and location.
@@ -90,13 +98,8 @@ function initAutocomplete() {
         path: google.maps.SymbolPath.CIRCLE,
         scale: 7,
         fillColor: color,
-        strokeColor: color,
-        anchor: new google.maps.Point(0, 2)
+        strokeColor: color
       };
-
-      var infowindow = new google.maps.InfoWindow({
-        content: '<p>' + place.name + '</p>'
-      });
 
       // Create a marker for each place.
       var marker = new google.maps.Marker({
@@ -107,21 +110,12 @@ function initAutocomplete() {
         animation: google.maps.Animation.DROP
       });
 
-      var mapLabel = new MapLabel({
-        text: place.name,
-        position: place.geometry.location,
-        map: map,
-        fontSize: 15,
-        align: 'center'
-      });
-
       marker.addListener('click', function() {
-        map.setZoom(16);
-        map.setCenter(marker.getPosition());
+        infowindow.setContent(place.name);
+        infowindow.open(map, marker);
       });
 
       result.markers.push(marker);
-      result.labels.push(mapLabel);
 
       if (place.geometry.viewport) {
         // Only geocodes have viewport.
@@ -169,9 +163,6 @@ function createResult(result){
     result.markers.forEach(function(marker) {
       marker.setMap(null);
     });
-    result.labels.forEach(function(label) {
-      label.setMap(null);
-    });
     resultElement.parentNode.removeChild(resultElement);
     resultElement = null;
     if(result.color !== undefined)
@@ -180,26 +171,15 @@ function createResult(result){
     checkColorArray();
   };
 
-  resultElement.addEventListener("click", removeResult);
-  resultElement.addEventListener("touchend", removeResult);
+  var removeBtn = resultElement.getElementsByClassName("remove-result")[0];
+  removeBtn.addEventListener("click", removeResult);
+  removeBtn.addEventListener("touchend", removeResult);
 
   // Prepend it to the parent element
   resultsWrap.insertBefore(resultElement, resultsWrap.firstChild);
 
   return result;
 };
-
-function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-  infoWindow.setPosition(pos);
-  infoWindow.setContent(browserHasGeolocation ?
-                        'Error: The Geolocation service failed.' :
-                        'Error: Your browser doesn\'t support geolocation.');
-  setTimeout(function(){
-    infoWindow.close();
-  }, 3000);
-}
-
-
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initAutocomplete"
          async defer></script>
