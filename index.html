@@ -91,7 +91,6 @@ function initAutocomplete() {
     });
 
     // For each place, get the icon, name and location.
-
     var bounds = new google.maps.LatLngBounds();
     places.forEach(function(place) {
       var icon = {
@@ -124,8 +123,9 @@ function initAutocomplete() {
         bounds.extend(place.geometry.location);
       }
     });
-
-    map.fitBounds(bounds);
+    // resize only if bounds are not in viewport
+    if(!map.getBounds().contains(bounds.getCenter()))
+      map.fitBounds(bounds);
 
     input.value = "";
   });
