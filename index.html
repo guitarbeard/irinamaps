@@ -62,11 +62,16 @@ function initAutocomplete() {
   var input = document.getElementById('pac-input');
   var searchBox = new google.maps.places.SearchBox(input);
   var infowindow = new google.maps.InfoWindow();
+
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
   // Bias the SearchBox results towards current map's viewport.
   map.addListener('bounds_changed', function() {
     searchBox.setBounds(map.getBounds());
+  });
+
+  map.addListener('click', function() {
+    infowindow.close();
   });
 
   // [START region_getplaces]
@@ -115,17 +120,21 @@ function initAutocomplete() {
       if(place.opening_hours)
         open_now_html = place.opening_hours.open_now ? "<p class='openNow'>Open meow!</p>" : "<p class='closedNow'>closed :(</p>";
 
-      var price_html = "";
+      // var price_html = "";
       // if(place.price_level)
       //   rating_html = "<p class='placePrice'>" + Array(place.price_level + 1).join("$") + "</p>";
 
-      var rating_html = "";
+      // var rating_html = "";
       // if(place.rating)
       //   rating_html = "<p class='placeRating'>" + place.rating + "/5</p>";
 
       marker.addListener('click', function() {
-        infowindow.setContent("<div class='infoWindow'>" + place.name + "<br>" + open_now_html + rating_html + price_html + "</div>");
+        infowindow.setContent("<div class='infoWindow'>" + place.name + "<br>" + open_now_html + "</div>");
         infowindow.open(map, marker);
+        google.maps.event.clearListeners(infowindow, 'closeclick');
+        infowindow.addListener('closeclick', function() {
+          marker.setMap(null);
+        });
       });
 
       result.markers.push(marker);
