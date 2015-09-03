@@ -42,16 +42,14 @@ body[full="true"] #results-wrap{
   font-weight: 300;
   margin-left: 12px;
   width: 300px;
-  display: flex;
-  align-items: stretch;
+  position: relative;
 }
 
 .result-text{
   padding: 7px 10px;
-  flex-grow: 2;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 230px;
+  width: 250px;
 }
 
 .result-amount{
@@ -61,21 +59,21 @@ body[full="true"] #results-wrap{
 
 .remove-result{
   color: #fff;
-  background-color: #d9534f;
-  border: 1px solid #d9534f;
+  background-color: rgba(100,100,100,0);
+  border: 1px solid rgba(100,100,100,0);
   font-size: 20px;
   line-height: 1;
   text-align: center;
   cursor: pointer;
-  vertical-align: top;
-  width: 50px;
+  width: 30px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  border-radius: 30px;
+  height: 30px;
 }
 
-.remove-result:hover{
-  background-color: #D2403C;
-}
-
-@media (max-width: 568px) {
+@media (max-width: 1024px) {
   #results-wrap{
     left: auto;
     right: 0px;
@@ -86,16 +84,15 @@ body[full="true"] #results-wrap{
     max-height: calc(100% - 30px);
   }
 
+}
+
+@media (max-width:567px) {
   .result{
-    width: 130px;
+    width: 160px;
   }
 
   .result-text{
-    width: 100px;
-  }
-
-  .remove-result{
-    width: 30px;
+    width: 110px;
   }
 }
 
