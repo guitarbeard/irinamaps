@@ -73,6 +73,34 @@ body[full="true"] #results-wrap{
   height: 30px;
 }
 
+.remove-result:hover{
+  opacity: .8;
+}
+
+.infoWindow{
+  clear: both;
+}
+
+.infoWindow p{
+  font-size: 10px;
+  margin: 0;
+}
+
+.openNow{
+  float: left;
+  color: #5cb85c;
+}
+
+.closedNow{
+  float: left;
+  color: #d9534f;
+}
+
+.placeRating, .placePrice{
+  float: right;
+  margin-left: 5px!important;
+}
+
 @media (max-width: 1024px) {
   #results-wrap{
     left: auto;
