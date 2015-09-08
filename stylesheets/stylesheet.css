@@ -87,8 +87,9 @@ body[full="true"] #results-wrap{
 }
 
 .infoWindow p{
-  font-size: 10px;
+  font-size: 11px;
   margin: 0;
+  margin-top: 5px;
 }
 
 .openNow{

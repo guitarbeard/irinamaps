@@ -108,8 +108,9 @@ function initAutocomplete() {
       if(place.opening_hours)
         open_now_html = place.opening_hours.open_now ? "<p class='openNow'>Open meow!</p>" : "<p class='closedNow'>closed :(</p>";
 
+      var btnBlock = place.opening_hours ? "" : " btn-block";
       var removeId = "remove" + Date.now();
-      var removeHtml = "<button id='" + removeId + "' type='button' class='btn btn-danger btn-xs remove-single-result'>remove</button>";
+      var removeHtml = "<button id='" + removeId + "' type='button' class='btn btn-danger btn-xs remove-single-result" + btnBlock + "'>remove</button>";
 
       marker.addListener('click', function() {
         infowindow.setContent("<div class='infoWindow'>" + place.name + "<br>" + open_now_html + removeHtml +  "</div>");
