@@ -56,7 +56,12 @@ body[full="true"] #results-wrap{
   margin: 0;
   font-size: 10px;
 }
-
+.remove-single-result{
+  font-size: 11px;
+  margin-left: 15px;
+  float: right;
+  margin-top: 5px;
+}
 .remove-result{
   color: #fff;
   background-color: rgba(100,100,100,0);

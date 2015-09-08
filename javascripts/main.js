@@ -13,7 +13,8 @@ function initAutocomplete() {
   var map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 33.682, lng: -117.890},
     zoom: 15,
-    mapTypeId: google.maps.MapTypeId.ROADMAP
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    mapTypeControl: false
   });
 
   // Try HTML5 geolocation.
@@ -107,19 +108,19 @@ function initAutocomplete() {
       if(place.opening_hours)
         open_now_html = place.opening_hours.open_now ? "<p class='openNow'>Open meow!</p>" : "<p class='closedNow'>closed :(</p>";
 
-      // var price_html = "";
-      // if(place.price_level)
-      //   rating_html = "<p class='placePrice'>" + Array(place.price_level + 1).join("$") + "</p>";
-
-      // var rating_html = "";
-      // if(place.rating)
-      //   rating_html = "<p class='placeRating'>" + place.rating + "/5</p>";
+      var removeId = "remove" + Date.now();
+      var removeHtml = "<button id='" + removeId + "' type='button' class='btn btn-danger btn-xs remove-single-result'>remove</button>";
 
       marker.addListener('click', function() {
-        infowindow.setContent("<div class='infoWindow'>" + place.name + "<br>" + open_now_html + "</div>");
+        infowindow.setContent("<div class='infoWindow'>" + place.name + "<br>" + open_now_html + removeHtml +  "</div>");
         infowindow.open(map, marker);
-        google.maps.event.clearListeners(infowindow, 'closeclick');
-        infowindow.addListener('closeclick', function() {
+        var removeBtn = document.getElementById(removeId);
+        google.maps.event.addDomListener(removeBtn, "click", function(event){
+          event.preventDefault();
+          marker.setMap(null);
+        });
+        google.maps.event.addDomListener(removeBtn, "touchend", function(event){
+          event.stopPropagation();
           marker.setMap(null);
         });
       });
