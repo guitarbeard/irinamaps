@@ -1,7 +1,7 @@
 // This example adds a search box to a map, using the Google Place Autocomplete
 // feature. People can enter geographical searches. The search box will return a
 // pick list containing a mix of places and predicted search terms.
-var colorArray = ['rgba(238, 200, 0, 100)', 'rgba(149, 25, 12, 100)', 'rgba(97, 3, 69, 100)', 'rgba(21, 140, 104, 100)', 'rgba(3, 74, 155, 100)'];
+var colorArray = ['#7BB5E1', '#8379A7', '#2B9A77', '#ACB0B3', '#CFB587', '#FDDC00', '#F35962', '#FF7636', '#810969', '#0065BA'];
 
 function initAutocomplete() {
   var labelScript = document.createElement('script');
