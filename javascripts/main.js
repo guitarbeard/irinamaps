@@ -81,11 +81,27 @@ function initAutocomplete() {
       selectedArea = null;
     }
     selectedArea = polygon;
+    checkAllMarkersAgainstSelectedArea();
+
     google.maps.event.addListener(selectedArea, 'click', function(event) {
       selectedArea.setMap(null);
       selectedArea = null;
+      checkAllMarkersAgainstSelectedArea();
     });
   });
+
+  function checkAllMarkersAgainstSelectedArea(){
+    for (var i = 0; i < allMarkers.length; i++) {
+      var marker = allMarkers[i];
+      var resultColor = marker.resultColor;
+      if(selectedArea)
+        resultColor = google.maps.geometry.poly.containsLocation(marker.getPosition(), selectedArea) ? resultColor : 'rgba(0,0,0,.15)';
+
+      var icon = marker.getIcon();
+      icon.fillColor = resultColor;
+      marker.setIcon(icon);
+    }
+  };
 
   // Listen for the event fired when the user selects a prediction and retrieve
   // more details for that place.
@@ -128,6 +144,7 @@ function initAutocomplete() {
         map: map,
         title: place.name,
         position: place.geometry.location,
+        resultColor: color,
         icon: icon,
         animation: google.maps.Animation.DROP
       });
@@ -136,12 +153,11 @@ function initAutocomplete() {
       if(place.opening_hours)
         open_now_html = place.opening_hours.open_now ? "<p class='openNow'>Open meow!</p>" : "<p class='closedNow'>closed :(</p>";
 
-      var btnBlock = place.opening_hours ? "" : " btn-block";
       var removeId = "remove" + Date.now();
-      var removeHtml = "<button id='" + removeId + "' type='button' class='btn btn-danger btn-xs remove-single-result" + btnBlock + "'>remove</button>";
+      var removeHtml = "<button id='" + removeId + "' type='button' class='btn btn-danger btn-xs remove-single-result'>remove</button>";
 
       marker.addListener('click', function() {
-        infowindow.setContent("<div class='infoWindow'>" + place.name + "<br>" + open_now_html + removeHtml +  "</div>");
+        infowindow.setContent("<div class='infoWindow'>" + place.name + removeHtml + "<br>" + open_now_html +  "</div>");
         infowindow.open(map, marker);
         var removeBtn = document.getElementById(removeId);
         google.maps.event.addDomListener(removeBtn, "click", function(event){
@@ -154,6 +170,7 @@ function initAutocomplete() {
         });
       });
 
+      allMarkers.push(marker);
       result.markers.push(marker);
 
       if (place.geometry.viewport) {
