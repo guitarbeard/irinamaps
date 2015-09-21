@@ -109,6 +109,7 @@ body[full="true"] #results-wrap{
 @media (max-width: 1024px) {
   #results-wrap{
     right: 0px;
+    max-height: calc(100% - 165px);
   }
 
   body[full="true"] #results-wrap{
