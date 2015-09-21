@@ -5,7 +5,23 @@ var colorArray = ['#7BB5E1', '#8379A7', '#2B9A77', '#C758A5', '#CFB587', '#FDDC0
 allMarkers = [],
 selectedArea = null,
 userLocationMarker = null;
+
 function initAutocomplete() {
+  var outerbounds = [
+      new google.maps.LatLng(85, 180),
+      new google.maps.LatLng(85, 90),
+      new google.maps.LatLng(85, 0),
+      new google.maps.LatLng(85, -90),
+      new google.maps.LatLng(85, -180),
+      new google.maps.LatLng(0, -180),
+      new google.maps.LatLng(-85, -180),
+      new google.maps.LatLng(-85, -90),
+      new google.maps.LatLng(-85, 0),
+      new google.maps.LatLng(-85, 90),
+      new google.maps.LatLng(-85, 180),
+      new google.maps.LatLng(0, 180),
+      new google.maps.LatLng(85, 180)
+    ];
   // Create the search box and link it to the UI element.
   var input = document.getElementById('pac-input');
   var defaultLocation = {lat: 33.682, lng: -117.890};
@@ -15,17 +31,6 @@ function initAutocomplete() {
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     mapTypeControl: false
   });
-
-  var drawingManager = new google.maps.drawing.DrawingManager({
-    drawingControl: true,
-    drawingControlOptions: {
-      position: google.maps.ControlPosition.BOTTOM_CENTER,
-      drawingModes: [
-        google.maps.drawing.OverlayType.POLYGON
-      ]
-    }
-  });
-  drawingManager.setMap(map);
 
   // Try HTML5 geolocation.
   if (navigator.geolocation) {
@@ -119,21 +124,28 @@ function initAutocomplete() {
 
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
-    // Bias the SearchBox results towards current map's viewport.
-    // map.addListener('bounds_changed', function() {
-    //   searchBox.setBounds(map.getBounds());
-    // });
-
     map.addListener('click', function() {
       infowindow.close();
     });
 
     // DRAWING!
-    google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
-      if(selectedArea){
-        selectedArea.setMap(null);
-        selectedArea = null;
+    var drawingManager = new google.maps.drawing.DrawingManager({
+      drawingControl: true,
+      drawingControlOptions: {
+        position: google.maps.ControlPosition.BOTTOM_CENTER,
+        drawingModes: [
+          google.maps.drawing.OverlayType.POLYGON
+        ]
       }
+    });
+    drawingManager.setMap(map);
+    google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
+
+      polygon.setOptions({
+        fillOpacity: .2,
+        strokeWeight: 0
+      });
+
       selectedArea = polygon;
       checkAllMarkersAgainstSelectedArea();
 
