@@ -5,12 +5,6 @@ var colorArray = ['#7BB5E1', '#8379A7', '#2B9A77', '#C758A5', '#CFB587', '#FDDC0
 allMarkers = [],
 selectedArea = null;
 function initAutocomplete() {
-  var labelScript = document.createElement('script');
-  labelScript.type = 'text/javascript';
-  labelScript.async = true;
-  labelScript.src = '../javascripts/maplabel-compiled.js';
-  document.body.appendChild(labelScript);
-
   var map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 33.682, lng: -117.890},
     zoom: 15,
@@ -59,9 +53,10 @@ function initAutocomplete() {
   }
 
   // Create the search box and link it to the UI element.
-  var input = document.getElementById('pac-input');
-  var searchBox = new google.maps.places.SearchBox(input);
-  var infowindow = new google.maps.InfoWindow();
+  var input = document.getElementById('pac-input'),
+  resultLimitInput = document.getElementById('result-limit-num'),
+  searchBox = new google.maps.places.SearchBox(input),
+  infowindow = new google.maps.InfoWindow();
 
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
