@@ -102,7 +102,7 @@ function initAutocomplete() {
   // more details for that place.
   searchBox.addListener('places_changed', function() {
     var places = searchBox.getPlaces();
-
+    resultLimitInput.value = Math.round(resultLimitInput.value);
     if (places.length == 0) {
       return;
     }
@@ -110,17 +110,19 @@ function initAutocomplete() {
     // create result
     var searchTerm = input.value,
     color = getRandomColor(),
-    results = places.length === 1 ? '' :  '<div class="result-amount">' + places.length +' results</div>';
+    results = places.length === 1 ? '' : places.length >= resultLimitInput.value ? '<div class="result-amount">' + resultLimitInput.value +' results</div>' : '<div class="result-amount">' + places.length +' results</div>';
 
     var result = createResult({
       content: '<div class="result-text">' + searchTerm + results + '</div><button class="remove-result" type="button">×</button>',
       color: color,
       markers: []
     });
-
     // For each place, get the icon, name and location.
     var bounds = new google.maps.LatLngBounds();
-    places.forEach(function(place) {
+    places.forEach(function(place, index) {
+      if(index >= resultLimitInput.value)
+        return false;
+
       var resultColor = color;
       if(selectedArea)
         resultColor = google.maps.geometry.poly.containsLocation(place.geometry.location, selectedArea) ? color : 'rgba(0,0,0,.15)';
