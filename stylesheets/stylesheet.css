@@ -148,6 +148,21 @@ body[full="true"] #pac-input{
   display: none;
 }
 
+#result-limit-num-wrap{
+  top: 0;
+  margin-top: 12px;
+  margin-left: 12px;
+  position: absolute;
+  left: 312px;
+  z-index: 1;
+  width: 88px
+}
+
+#result-limit-num{
+  padding-right: 0;
+}
+
+
 .pac-container {
   font-family: Roboto;
 }

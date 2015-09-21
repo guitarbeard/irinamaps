@@ -10,6 +10,10 @@
   <body>
     <div id="results-wrap"></div>
     <input id="pac-input" class="controls" type="text" placeholder="Search...">
+    <div id="result-limit-num-wrap" class="input-group input-group-sm">
+      <span class="input-group-addon" id="result-limit-addon">max results:</span>
+      <input id="result-limit-num" class="form-control" type="number" value="20" aria-describedby="result-limit-addon">
+    </div>
     <div id="map"></div>
     <script src="../javascripts/main.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?libraries=places,drawing,geometry&callback=initAutocomplete"
