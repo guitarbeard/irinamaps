@@ -1,8 +1,9 @@
 // This example adds a search box to a map, using the Google Place Autocomplete
 // feature. People can enter geographical searches. The search box will return a
 // pick list containing a mix of places and predicted search terms.
-var colorArray = ['#7BB5E1', '#8379A7', '#2B9A77', '#ACB0B3', '#CFB587', '#FDDC00', '#F35962', '#FF7636', '#810969', '#0065BA'];
-
+var colorArray = ['#7BB5E1', '#8379A7', '#2B9A77', '#C758A5', '#CFB587', '#FDDC00', '#F35962', '#FF7636', '#810969', '#0065BA'],
+allMarkers = [],
+selectedArea = null;
 function initAutocomplete() {
   var labelScript = document.createElement('script');
   labelScript.type = 'text/javascript';
@@ -16,6 +17,17 @@ function initAutocomplete() {
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     mapTypeControl: false
   });
+
+  var drawingManager = new google.maps.drawing.DrawingManager({
+    drawingControl: true,
+    drawingControlOptions: {
+      position: google.maps.ControlPosition.BOTTOM_CENTER,
+      drawingModes: [
+        google.maps.drawing.OverlayType.POLYGON
+      ]
+    }
+  });
+  drawingManager.setMap(map);
 
   // Try HTML5 geolocation.
   if (navigator.geolocation) {
@@ -62,7 +74,19 @@ function initAutocomplete() {
     infowindow.close();
   });
 
-  // [START region_getplaces]
+  // DRAWING!
+  google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
+    if(selectedArea){
+      selectedArea.setMap(null);
+      selectedArea = null;
+    }
+    selectedArea = polygon;
+    google.maps.event.addListener(selectedArea, 'click', function(event) {
+      selectedArea.setMap(null);
+      selectedArea = null;
+    });
+  });
+
   // Listen for the event fired when the user selects a prediction and retrieve
   // more details for that place.
   searchBox.addListener('places_changed', function() {
@@ -86,9 +110,13 @@ function initAutocomplete() {
     // For each place, get the icon, name and location.
     var bounds = new google.maps.LatLngBounds();
     places.forEach(function(place) {
+      var resultColor = color;
+      if(selectedArea)
+        resultColor = google.maps.geometry.poly.containsLocation(place.geometry.location, selectedArea) ? color : 'rgba(0,0,0,.15)';
+
       var icon = {
         path: "M19.39,1.562c-2.505-1.238-5.94-0.477-8.377,1.643C8.576,1.085,5.141,0.323,2.636,1.562 C-0.357,3.039-0.88,6.782,1.474,9.924l1.962,2.065l0.402,0.425l7.174,7.56l7.174-7.56l0.402-0.425l1.963-2.065 C22.906,6.782,22.383,3.039,19.39,1.562z",
-        fillColor: color,
+        fillColor: resultColor,
         strokeColor: '#fff',
         fillOpacity: 1,
         strokeOpacity: .5,
