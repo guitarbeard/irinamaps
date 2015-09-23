@@ -176,7 +176,7 @@ body[full="true"] #results-wrap{
   border-color: #4d90fe;
 }
 
-body[full="true"] #pac-input{
+body[full="true"] #pac-input, body[full="true"] #result-limit-num-wrap{
   display: none;
 }
 
