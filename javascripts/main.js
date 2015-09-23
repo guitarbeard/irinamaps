@@ -115,32 +115,32 @@ function initAutocomplete() {
     });
 
     // DRAWING!
-    var drawingManager = new google.maps.drawing.DrawingManager({
-      drawingControl: true,
-      drawingControlOptions: {
-        position: google.maps.ControlPosition.BOTTOM_CENTER,
-        drawingModes: [
-          google.maps.drawing.OverlayType.POLYGON
-        ]
-      }
-    });
-    drawingManager.setMap(map);
-    google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
-
-      polygon.setOptions({
-        fillOpacity: .2,
-        strokeWeight: 0
-      });
-
-      selectedArea = polygon;
-      checkAllMarkersAgainstSelectedArea();
-
-      google.maps.event.addListener(selectedArea, 'click', function(event) {
-        selectedArea.setMap(null);
-        selectedArea = null;
-        checkAllMarkersAgainstSelectedArea();
-      });
-    });
+    // var drawingManager = new google.maps.drawing.DrawingManager({
+    //   drawingControl: true,
+    //   drawingControlOptions: {
+    //     position: google.maps.ControlPosition.BOTTOM_CENTER,
+    //     drawingModes: [
+    //       google.maps.drawing.OverlayType.POLYGON
+    //     ]
+    //   }
+    // });
+    // drawingManager.setMap(map);
+    // google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
+    //
+    //   polygon.setOptions({
+    //     fillOpacity: .2,
+    //     strokeWeight: 0
+    //   });
+    //
+    //   selectedArea = polygon;
+    //   checkAllMarkersAgainstSelectedArea();
+    //
+    //   google.maps.event.addListener(selectedArea, 'click', function(event) {
+    //     selectedArea.setMap(null);
+    //     selectedArea = null;
+    //     checkAllMarkersAgainstSelectedArea();
+    //   });
+    // });
 
     function checkAllMarkersAgainstSelectedArea(){
       for (var i = 0; i < allMarkers.length; i++) {
