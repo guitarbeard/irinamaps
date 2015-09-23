@@ -29,7 +29,8 @@ function initAutocomplete() {
         map: map,
         position: pos,
         animation: google.maps.Animation.DROP,
-        zIndex: google.maps.Marker.MAX_ZINDEX + 1
+        zIndex: google.maps.Marker.MAX_ZINDEX + 1,
+        optimized: false
       });
 
       marker.addListener('click', function() {
@@ -52,7 +53,8 @@ function initAutocomplete() {
           map: map,
           position: places[0].geometry.location,
           animation: google.maps.Animation.DROP,
-          zIndex: google.maps.Marker.MAX_ZINDEX + 1
+          zIndex: google.maps.Marker.MAX_ZINDEX + 1,
+          optimized: false
         });
 
         marker.addListener('click', function() {
@@ -79,7 +81,8 @@ function initAutocomplete() {
         map: map,
         position: places[0].geometry.location,
         animation: google.maps.Animation.DROP,
-        zIndex: google.maps.Marker.MAX_ZINDEX + 1
+        zIndex: google.maps.Marker.MAX_ZINDEX + 1,
+        optimized: false
       });
 
       marker.addListener('click', function() {
