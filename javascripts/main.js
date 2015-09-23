@@ -7,21 +7,6 @@ selectedArea = null,
 userLocationMarker = null;
 
 function initAutocomplete() {
-  var outerbounds = [
-      new google.maps.LatLng(85, 180),
-      new google.maps.LatLng(85, 90),
-      new google.maps.LatLng(85, 0),
-      new google.maps.LatLng(85, -90),
-      new google.maps.LatLng(85, -180),
-      new google.maps.LatLng(0, -180),
-      new google.maps.LatLng(-85, -180),
-      new google.maps.LatLng(-85, -90),
-      new google.maps.LatLng(-85, 0),
-      new google.maps.LatLng(-85, 90),
-      new google.maps.LatLng(-85, 180),
-      new google.maps.LatLng(0, 180),
-      new google.maps.LatLng(85, 180)
-    ];
   // Create the search box and link it to the UI element.
   var input = document.getElementById('pac-input');
   var defaultLocation = {lat: 33.682, lng: -117.890};
@@ -120,7 +105,8 @@ function initAutocomplete() {
 
     var resultLimitInput = document.getElementById('result-limit-num'),
     searchBox = new google.maps.places.SearchBox(input, searchBoxOptions),
-    infowindow = new google.maps.InfoWindow();
+    infowindow = new google.maps.InfoWindow(),
+    detailService = new google.maps.places.PlacesService(map);
 
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
@@ -217,25 +203,29 @@ function initAutocomplete() {
           animation: google.maps.Animation.DROP
         });
 
-        var open_now_html = "";
-        if(place.opening_hours)
-          open_now_html = place.opening_hours.open_now ? "<p class='openNow'>Open meow!</p>" : "<p class='closedNow'>closed :(</p>";
-
-        var removeId = "remove" + Date.now();
-        var removeHtml = "<button id='" + removeId + "' type='button' class='btn btn-danger btn-xs remove-single-result'>remove</button>";
-
         marker.addListener('click', function() {
-          infowindow.setContent("<div class='infoWindow'>" + place.name + removeHtml + "<br>" + open_now_html +  "</div>");
-          infowindow.open(map, marker);
-          var removeBtn = document.getElementById(removeId);
-          google.maps.event.addDomListener(removeBtn, "click", function(event){
-            event.preventDefault();
-            marker.setMap(null);
-          });
-          google.maps.event.addDomListener(removeBtn, "touchend", function(event){
-            event.stopPropagation();
-            marker.setMap(null);
-          });
+          var request = {
+            placeId: place.place_id
+          };
+
+          detailService.getDetails(request, detailCallback);
+
+          function detailCallback(placeDetail, status) {
+            if (status == google.maps.places.PlacesServiceStatus.OK) {
+              place = placeDetail;
+            }
+            infowindow.setContent("<div class='infoWindow'>" + buildInfoWindowHtml(place) +  "</div>");
+            infowindow.open(map, marker);
+            var removeBtn = document.getElementById('remove' + place.place_id);
+            google.maps.event.addDomListener(removeBtn, "click", function(event){
+              event.preventDefault();
+              marker.setMap(null);
+            });
+            google.maps.event.addDomListener(removeBtn, "touchend", function(event){
+              event.stopPropagation();
+              marker.setMap(null);
+            });
+          }
         });
 
         allMarkers.push(marker);
@@ -255,6 +245,47 @@ function initAutocomplete() {
       input.value = "";
     });
   }
+}
+
+function buildInfoWindowHtml(place) {
+  var photo = "";
+  if(place.photos){
+    var src = place.photos[0].getUrl({'maxHeight': 500, 'maxWidth': 500});
+    photo = "<div class='place-img' style='background-image:url("+src+");'></div><span class='attribution'>" + place.photos[0].html_attributions[0] + "</span><br>";
+  }
+
+  var name = "<strong>" + place.name + "</strong>";
+
+  var remove = "<button id='remove" + place.place_id + "' type='button' class='btn btn-danger btn-xs remove-single-result'>remove</button>";
+
+  var address = "";
+  for (var i = 0; i < place.address_components.length; i++) {
+    if(i === 0)
+      address += "<br>";
+    if(place.address_components[i].types[0] === "locality"){
+      if(i !== 0)
+        address += "<br>";
+      address += place.address_components[i].short_name + ", ";
+    }else if(place.address_components[i].types[0] !== "country" && place.address_components[i].types[0] !== "administrative_area_level_3" && place.address_components[i].types[0] !== "administrative_area_level_2"){
+      address += place.address_components[i].short_name + " ";
+    }
+  }
+
+  var phone = "";
+  if(place.formatted_phone_number)
+    phone = "<br><a href='tel:" + place.formatted_phone_number + "'>" + place.formatted_phone_number + "</a>";
+
+  var website = "";
+  if(place.website || place.url){
+    var site = place.website ? place.website : place.url;
+    website = "<br><a class='website' href='" + site + "'>" + site + "</a>";
+  }
+
+  var open_now = "";
+  if(place.opening_hours)
+    open_now = place.opening_hours.open_now ? "<br><span class='openNow'>Open meow!</span>" : "<br><span class='closedNow'>closed :(</span>";
+
+  return photo + name + remove + address + phone + website + open_now;
 }
 
 function randomIntFromInterval(min,max) {

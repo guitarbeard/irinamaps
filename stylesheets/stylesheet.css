@@ -84,20 +84,35 @@ body[full="true"] #results-wrap{
   clear: both;
 }
 
-.infoWindow p{
-  font-size: 11px;
-  margin: 0;
-  margin-top: 5px;
+.place-img{
+  height: 100px;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.attribution{
+  font-size: 8px;
+}
+
+.img-responive{
+  margin-bottom: 5px;
 }
 
 .openNow{
-  float: left;
   color: #5cb85c;
 }
 
 .closedNow{
-  float: left;
   color: #d9534f;
+}
+
+.website{
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 18px;
+  display: inline-block;
 }
 
 .placeRating, .placePrice{
