@@ -114,6 +114,7 @@ function initAutocomplete() {
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
     map.addListener('click', function() {
+      input.blur();
       infowindow.close();
     });
 
