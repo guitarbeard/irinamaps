@@ -109,7 +109,13 @@ function initAutocomplete() {
     var resultLimitInput = document.getElementById('result-limit-num'),
     searchBox = new google.maps.places.SearchBox(input, searchBoxOptions),
     infowindow = new google.maps.InfoWindow(),
-    detailService = new google.maps.places.PlacesService(map);
+    detailService = new google.maps.places.PlacesService(map),
+    takeMeHomeButton = document.getElementById('take-me-home');
+
+    google.maps.event.addDomListener(takeMeHomeButton, "click", function(event){
+      map.setZoom(15);
+      map.setCenter(userLocationMarker.getPosition());
+    });
 
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 

@@ -9,6 +9,20 @@ html, body {
 #target {
   width: 345px;
 }
+#take-me-home{
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  margin-left: 12px;
+  bottom: 30px;
+  border-radius: 100px;
+  padding: 8px 9px;
+  font-size: 20px;
+  height: 40px;
+}
+
+#take-me-home:focus {outline:0;}
+
 .controls {
   margin-top: 10px;
   border: 1px solid transparent;
@@ -24,7 +38,7 @@ html, body {
   z-index: 1;
   position: absolute;
   top: 43px;
-  max-height: calc(100% - 75px);
+  max-height: calc(100% - 117px);
   overflow: auto;
 }
 
