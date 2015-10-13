@@ -26,7 +26,7 @@ function initAutocomplete() {
   });
 
   google.maps.event.addDomListener(editHomeButton, "click", function(event){
-    setLocationSearcbox();
+    setLocationSearchbox();
   });
 
   // Try HTML5 geolocation.
@@ -54,15 +54,16 @@ function initAutocomplete() {
       map.setCenter(pos);
       setMap();
     }, function() {
-      setLocationSearcbox();
+      setLocationSearchbox();
     });
 
   } else {
     // Browser doesn't support Geolocation
-    setLocationSearcbox();
+    setLocationSearchbox();
   }
 
-  function setLocationSearcbox() {
+  function setLocationSearchbox() {
+    document.getElementsByTagName('body')[0].setAttribute('location-set', 'false');
     google.maps.event.clearInstanceListeners(input);
     input.setAttribute("placeholder", "Set location...");
     input.setAttribute("style", "");
@@ -98,8 +99,8 @@ function initAutocomplete() {
   }
 
   function setMap(){
+    document.getElementsByTagName('body')[0].setAttribute('location-set', 'true');
     google.maps.event.clearInstanceListeners(input);
-    google.maps.event.clearInstanceListeners(map);
     input.setAttribute("placeholder", "Search...");
     input.setAttribute("style", "");
     input.value = "";
@@ -164,7 +165,6 @@ function initAutocomplete() {
     // Listen for the event fired when the user selects a prediction and retrieve
     // more details for that place.
     searchBox.addListener('places_changed', function() {
-      input.setAttribute("style", "");
       var places = searchBox.getPlaces();
       resultLimitInput.value = Math.round(resultLimitInput.value);
       if (places.length == 0) {
@@ -237,18 +237,13 @@ function initAutocomplete() {
 
         allMarkers.push(marker);
         result.markers.push(marker);
-
-        if (place.geometry.viewport) {
-          // Only geocodes have viewport.
-          bounds.union(place.geometry.viewport);
-        } else {
-          bounds.extend(place.geometry.location);
-        }
       });
-      // resize only if bounds are not in viewport
-      if(!map.getBounds().contains(bounds.getCenter()))
-        map.fitBounds(bounds);
 
+      for (var i = 0; i < allMarkers.length; i++) {
+        bounds.extend(allMarkers[i].getPosition());
+      }
+      bounds.extend(userLocationMarker.getPosition());
+      map.fitBounds(bounds);
       input.value = "";
     });
   }

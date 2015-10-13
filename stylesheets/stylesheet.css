@@ -10,6 +10,7 @@ html, body {
   width: 345px;
 }
 #take-me-home{
+  display: none;
   position: absolute;
   z-index: 1;
   left: 0;
@@ -22,6 +23,7 @@ html, body {
 }
 
 #edit-home{
+  display: none;
   position: absolute;
   bottom: 70px;
   z-index: 1;
@@ -47,6 +49,10 @@ html, body {
   top: 43px;
   max-height: calc(100% - 145px);
   overflow: auto;
+}
+
+body[location-set="true"] #take-me-home, body[location-set="true"] #edit-home{
+  display: block;
 }
 
 body[full="true"] #results-wrap{
@@ -138,6 +144,7 @@ body[full="true"] #results-wrap{
 }
 
 #result-limit-num-wrap{
+  display: none;
   top: 0;
   margin-top: 12px;
   margin-left: 12px;
@@ -145,6 +152,10 @@ body[full="true"] #results-wrap{
   left: 312px;
   z-index: 1;
   width: 88px
+}
+
+body[location-set='true'] #result-limit-num-wrap{
+  display: inline-table;
 }
 
 #result-limit-num{
