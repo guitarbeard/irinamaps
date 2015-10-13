@@ -21,6 +21,13 @@ html, body {
   height: 40px;
 }
 
+#edit-home{
+  position: absolute;
+  bottom: 70px;
+  z-index: 1;
+  left: 7px;
+}
+
 #take-me-home:focus {outline:0;}
 
 .controls {
@@ -38,7 +45,7 @@ html, body {
   z-index: 1;
   position: absolute;
   top: 43px;
-  max-height: calc(100% - 117px);
+  max-height: calc(100% - 145px);
   overflow: auto;
 }
 

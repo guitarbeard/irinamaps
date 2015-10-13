@@ -17,6 +17,18 @@ function initAutocomplete() {
     mapTypeControl: false
   });
 
+  var takeMeHomeButton = document.getElementById('take-me-home'),
+  editHomeButton = document.getElementById('edit-home');
+
+  google.maps.event.addDomListener(takeMeHomeButton, "click", function(event){
+    map.setZoom(15);
+    map.setCenter(userLocationMarker.getPosition());
+  });
+
+  google.maps.event.addDomListener(editHomeButton, "click", function(event){
+    setLocationSearcbox();
+  });
+
   // Try HTML5 geolocation.
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
@@ -42,34 +54,23 @@ function initAutocomplete() {
       map.setCenter(pos);
       setMap();
     }, function() {
-      var userLocationSearchBox = new google.maps.places.SearchBox(input);
-      var userLocationSearchBoxEvent = userLocationSearchBox.addListener('places_changed', function() {
-        var places = userLocationSearchBox.getPlaces();
-        if (places.length == 0) {
-          return;
-        }
-
-        var marker = new google.maps.Marker({
-          map: map,
-          position: places[0].geometry.location,
-          animation: google.maps.Animation.DROP,
-          zIndex: google.maps.Marker.MAX_ZINDEX + 1,
-          optimized: false
-        });
-
-        marker.addListener('click', function() {
-          map.setZoom(15);
-          map.setCenter(places[0].geometry.location);
-        });
-
-        map.setCenter(places[0].geometry.location);
-        userLocationMarker = marker;
-        setMap();
-      });
+      setLocationSearcbox();
     });
 
   } else {
     // Browser doesn't support Geolocation
+    setLocationSearcbox();
+  }
+
+  function setLocationSearcbox() {
+    google.maps.event.clearInstanceListeners(input);
+    input.setAttribute("placeholder", "Set location...");
+    input.setAttribute("style", "");
+    input.value = "";
+    input.focus();
+    if(userLocationMarker)
+      userLocationMarker.setMap(null);
+    userLocationMarker = null;
     var userLocationSearchBox = new google.maps.places.SearchBox(input);
     var userLocationSearchBoxEvent = userLocationSearchBox.addListener('places_changed', function() {
       var places = userLocationSearchBox.getPlaces();
@@ -98,10 +99,12 @@ function initAutocomplete() {
 
   function setMap(){
     google.maps.event.clearInstanceListeners(input);
-
-    input.setAttribute("style", "");
+    google.maps.event.clearInstanceListeners(map);
     input.setAttribute("placeholder", "Search...");
+    input.setAttribute("style", "");
     input.value = "";
+    input.focus();
+
     var searchBoxOptions = {
       bounds: new google.maps.Circle({center: userLocationMarker.getPosition(), radius: 30}).getBounds()
     };
@@ -109,15 +112,8 @@ function initAutocomplete() {
     var resultLimitInput = document.getElementById('result-limit-num'),
     searchBox = new google.maps.places.SearchBox(input, searchBoxOptions),
     infowindow = new google.maps.InfoWindow(),
-    detailService = new google.maps.places.PlacesService(map),
-    takeMeHomeButton = document.getElementById('take-me-home');
-
-    google.maps.event.addDomListener(takeMeHomeButton, "click", function(event){
-      map.setZoom(15);
-      map.setCenter(userLocationMarker.getPosition());
-    });
-
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+    detailService = new google.maps.places.PlacesService(map);
+    input.setAttribute("style", "");
 
     map.addListener('click', function() {
       input.blur();
@@ -168,6 +164,7 @@ function initAutocomplete() {
     // Listen for the event fired when the user selects a prediction and retrieve
     // more details for that place.
     searchBox.addListener('places_changed', function() {
+      input.setAttribute("style", "");
       var places = searchBox.getPlaces();
       resultLimitInput.value = Math.round(resultLimitInput.value);
       if (places.length == 0) {
