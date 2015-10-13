@@ -2,7 +2,7 @@
 // feature. People can enter geographical searches. The search box will return a
 // pick list containing a mix of places and predicted search terms.
 var colorArray = ['#7BB5E1', '#8379A7', '#2B9A77', '#C758A5', '#96815B', '#FFD606', '#F35962', '#FF7636', '#810969', '#0065BA'],
-allMarkers = [],
+allMarkers = {},
 selectedArea = null,
 userLocationMarker = null;
 
@@ -121,47 +121,6 @@ function initAutocomplete() {
       infowindow.close();
     });
 
-    // DRAWING!
-    // var drawingManager = new google.maps.drawing.DrawingManager({
-    //   drawingControl: true,
-    //   drawingControlOptions: {
-    //     position: google.maps.ControlPosition.BOTTOM_CENTER,
-    //     drawingModes: [
-    //       google.maps.drawing.OverlayType.POLYGON
-    //     ]
-    //   }
-    // });
-    // drawingManager.setMap(map);
-    // google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
-    //
-    //   polygon.setOptions({
-    //     fillOpacity: .2,
-    //     strokeWeight: 0
-    //   });
-    //
-    //   selectedArea = polygon;
-    //   checkAllMarkersAgainstSelectedArea();
-    //
-    //   google.maps.event.addListener(selectedArea, 'click', function(event) {
-    //     selectedArea.setMap(null);
-    //     selectedArea = null;
-    //     checkAllMarkersAgainstSelectedArea();
-    //   });
-    // });
-
-    function checkAllMarkersAgainstSelectedArea(){
-      for (var i = 0; i < allMarkers.length; i++) {
-        var marker = allMarkers[i];
-        var resultColor = marker.resultColor;
-        if(selectedArea)
-          resultColor = google.maps.geometry.poly.containsLocation(marker.getPosition(), selectedArea) ? resultColor : 'rgba(0,0,0,.15)';
-
-        var icon = marker.getIcon();
-        icon.fillColor = resultColor;
-        marker.setIcon(icon);
-      }
-    };
-
     // Listen for the event fired when the user selects a prediction and retrieve
     // more details for that place.
     searchBox.addListener('places_changed', function() {
@@ -202,6 +161,7 @@ function initAutocomplete() {
 
         // Create a marker for each place.
         var marker = new google.maps.Marker({
+          id: place.place_id,
           map: map,
           title: place.name,
           position: place.geometry.location,
@@ -227,19 +187,21 @@ function initAutocomplete() {
             google.maps.event.addDomListener(removeBtn, "click", function(event){
               event.preventDefault();
               marker.setMap(null);
+              delete allMarkers[marker.id];
             });
             google.maps.event.addDomListener(removeBtn, "touchend", function(event){
               event.stopPropagation();
               marker.setMap(null);
+              delete allMarkers[marker.id];
             });
           }
         });
 
-        allMarkers.push(marker);
+        allMarkers[marker.id] = marker;
         result.markers.push(marker);
       });
 
-      for (var i = 0; i < allMarkers.length; i++) {
+      for (var i in allMarkers) {
         bounds.extend(allMarkers[i].getPosition());
       }
       bounds.extend(userLocationMarker.getPosition());
@@ -320,6 +282,7 @@ function createResult(result){
     event.preventDefault();
     result.markers.forEach(function(marker) {
       marker.setMap(null);
+      delete allMarkers[marker.id];
     });
     resultElement.parentNode.removeChild(resultElement);
     resultElement = null;
