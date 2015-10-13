@@ -3,6 +3,7 @@
 // pick list containing a mix of places and predicted search terms.
 var colorArray = ['#7BB5E1', '#8379A7', '#2B9A77', '#C758A5', '#96815B', '#FFD606', '#F35962', '#FF7636', '#810969', '#0065BA'],
 allMarkers = {},
+allResults = [],
 selectedArea = null,
 userLocationMarker = null;
 
@@ -62,6 +63,12 @@ function initAutocomplete() {
     setLocationSearchbox();
   }
 
+  function redoSearchResults() {
+    for (var i = 0; i < allResults.length; i++) {
+      console.log(allResults[i]);
+    }
+  }
+
   function setLocationSearchbox() {
     document.getElementsByTagName('body')[0].setAttribute('location-set', 'false');
     google.maps.event.clearInstanceListeners(input);
@@ -95,6 +102,9 @@ function initAutocomplete() {
       map.setCenter(places[0].geometry.location);
       userLocationMarker = marker;
       setMap();
+
+      // redo past searches
+      redoSearchResults();
     });
   }
 
@@ -136,10 +146,12 @@ function initAutocomplete() {
       results = places.length === 1 ? '' : places.length >= resultLimitInput.value ? '<div class="result-amount">' + resultLimitInput.value +' results</div>' : '<div class="result-amount">' + places.length +' results</div>';
 
       var result = createResult({
+        searchTerm: searchTerm,
         content: '<div class="result-text">' + searchTerm + results + '</div><button class="remove-result" type="button">×</button>',
         color: color,
         markers: []
       });
+
       // For each place, get the icon, name and location.
       var bounds = new google.maps.LatLngBounds();
       places.forEach(function(place, index) {
@@ -277,6 +289,7 @@ function createResult(result){
   };
 
   checkColorArray();
+  allResults.push(result.searchTerm);
 
   function removeResult (event) {
     event.preventDefault();
@@ -284,6 +297,7 @@ function createResult(result){
       marker.setMap(null);
       delete allMarkers[marker.id];
     });
+    allResults.splice(allResults.indexOf(result.searchTerm), 1);
     resultElement.parentNode.removeChild(resultElement);
     resultElement = null;
     if(result.color !== undefined)
