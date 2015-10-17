@@ -81,7 +81,8 @@ function initAutocomplete() {
   }
 
   function setLocationSearchbox() {
-    document.getElementsByTagName('body')[0].setAttribute('location-set', 'false');
+    document.body.setAttribute('location-set', false);
+    document.body.setAttribute('full', false);
     google.maps.event.clearInstanceListeners(input);
     input.setAttribute("placeholder", "Set location...");
     input.setAttribute("style", "");
@@ -120,7 +121,7 @@ function initAutocomplete() {
   }
 
   function setMap(){
-    document.getElementsByTagName('body')[0].setAttribute('location-set', 'true');
+    document.body.setAttribute('location-set', true);
     google.maps.event.clearInstanceListeners(input);
     input.setAttribute("placeholder", "Search...");
     input.setAttribute("style", "");
