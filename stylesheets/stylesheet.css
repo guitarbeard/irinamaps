@@ -30,6 +30,14 @@ html, body {
   left: 7px;
 }
 
+#toggle-results{
+  display: none;
+  position: absolute;
+  top: 47px;
+  z-index: 1;
+  left: 324px;
+}
+
 #take-me-home:focus {outline:0;}
 
 .controls {
@@ -55,9 +63,17 @@ body[location-set="true"] #take-me-home, body[location-set="true"] #edit-home{
   display: block;
 }
 
+body[has-results="true"] #toggle-results{
+  display: block;
+}
+
 body[full="true"] #results-wrap{
   top: 5px;
   max-height: calc(100% - 125px);
+}
+
+body[show-results="false"] #results-wrap{
+  display: none;
 }
 
 .result{
@@ -164,10 +180,16 @@ body[location-set='true'] #result-limit-num-wrap{
 }
 
 @media (max-width: 1024px) {
+  #toggle-results{
+    top: 10px;
+    right: 5px;
+    left: inherit;
+  }
+
   #results-wrap{
-    top: 5px;
+    top: 43px;
     right: 0;
-    max-height: calc(100% - 130px);
+    max-height: calc(100% - 170px);
   }
 
   .result{
@@ -187,18 +209,23 @@ body[location-set='true'] #result-limit-num-wrap{
 @media (max-width:567px) {
 
   .result{
-    width: 110px;
+    width: 88px;
   }
 
   .result-text{
-    width: 100px;
+    width: 78px;
   }
 }
 
-@media (max-width:436px) {
+@media (max-width:404px) {
+
+  #toggle-results{
+    top: 47px;
+  }
+
   #results-wrap{
-    top: 43px;
-    max-height: calc(100% - 170px);
+    top: 75px;
+    max-height: calc(100% - 200px);
   }
 }
 

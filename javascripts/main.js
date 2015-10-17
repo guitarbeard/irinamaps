@@ -1,7 +1,7 @@
 // This example adds a search box to a map, using the Google Place Autocomplete
 // feature. People can enter geographical searches. The search box will return a
 // pick list containing a mix of places and predicted search terms.
-var colorArray = ['#7BB5E1', '#8379A7', '#2B9A77', '#C758A5', '#795548', '#FFC107', '#FF7636', '#810969', '#0065BA'],
+var colorArray = ['#7BB5E1', '#8379A7', '#2B9A77', '#C758A5', '#795548', '#8F6456', '#D25441', '#73215F', '#0065BA'],
 allMarkers = {},
 allResults = [],
 selectedArea = null,
@@ -19,7 +19,8 @@ function initAutocomplete() {
   });
 
   var takeMeHomeButton = document.getElementById('take-me-home'),
-  editHomeButton = document.getElementById('edit-home');
+  editHomeButton = document.getElementById('edit-home'),
+  toggleResultsButton = document.getElementById('toggle-results');
 
   google.maps.event.addDomListener(takeMeHomeButton, "click", function(event){
     map.setZoom(15);
@@ -28,6 +29,16 @@ function initAutocomplete() {
 
   google.maps.event.addDomListener(editHomeButton, "click", function(event){
     setLocationSearchbox();
+  });
+
+  google.maps.event.addDomListener(toggleResultsButton, "click", function(event){
+    if(document.body.getAttribute('show-results') === 'true'){
+      document.body.setAttribute('show-results', false);
+      toggleResultsButton.innerHTML = 'show list';
+    }else{
+      document.body.setAttribute('show-results', true);
+      toggleResultsButton.innerHTML = 'hide list';
+    }
   });
 
   // Try HTML5 geolocation.
@@ -286,6 +297,13 @@ function createResult(result){
     }else{
       document.body.setAttribute('full', false);
     }
+
+    if(colorArray.length !== 9){
+      document.body.setAttribute('has-results', true);
+    }else{
+      document.body.setAttribute('has-results', false);
+    }
+
   };
 
   checkColorArray();
