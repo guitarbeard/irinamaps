@@ -186,7 +186,7 @@ body[location-set='true'] #result-limit-num-wrap{
     left: inherit;
   }
 
-  #results-wrap{
+  #results-wrap, body[full="true"] #results-wrap, body[full="false"] #results-wrap{
     top: 43px;
     right: 0;
     max-height: calc(100% - 170px);
@@ -223,7 +223,7 @@ body[location-set='true'] #result-limit-num-wrap{
     top: 47px;
   }
 
-  #results-wrap{
+  #results-wrap, body[full="true"] #results-wrap, body[full="false"] #results-wrap{
     top: 75px;
     max-height: calc(100% - 200px);
   }
