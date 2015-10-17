@@ -251,6 +251,10 @@ body[full="true"] #pac-input, body[full="true"] #result-limit-num-wrap{
   display: none;
 }
 
+body[full="true"] #toggle-results{
+  top: 10px;
+}
+
 .pac-container {
   font-family: Roboto;
 }

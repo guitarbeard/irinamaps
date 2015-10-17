@@ -1,7 +1,7 @@
 // This example adds a search box to a map, using the Google Place Autocomplete
 // feature. People can enter geographical searches. The search box will return a
 // pick list containing a mix of places and predicted search terms.
-var colorArray = ['#7BB5E1', '#8379A7', '#2B9A77', '#C758A5', '#795548', '#8F6456', '#D25441', '#73215F', '#0065BA'],
+var colorArray = ['#7BB5E1', '#8379A7', '#2B9A77', '#C758A5', '#EDBA32', '#8F6456', '#D25441', '#73215F', '#0065BA'],
 allMarkers = {},
 allResults = [],
 selectedArea = null,
