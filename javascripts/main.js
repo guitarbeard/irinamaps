@@ -4,7 +4,6 @@
 var colorArray = ['#7BB5E1', '#8379A7', '#2B9A77', '#C758A5', '#EDBA32', '#8F6456', '#D25441', '#73215F', '#0065BA'],
 allMarkers = {},
 allResults = [],
-selectedArea = null,
 userLocationMarker = null;
 
 function initAutocomplete() {
@@ -18,9 +17,14 @@ function initAutocomplete() {
     mapTypeControl: false
   });
 
+
   var takeMeHomeButton = document.getElementById('take-me-home'),
   editHomeButton = document.getElementById('edit-home'),
-  toggleResultsButton = document.getElementById('toggle-results');
+  toggleResultsButton = document.getElementById('toggle-results')
+  resultLimitInput = document.getElementById('result-limit-num'),
+  infowindow = new google.maps.InfoWindow(),
+  placesService = new google.maps.places.PlacesService(map);
+
 
   google.maps.event.addDomListener(takeMeHomeButton, "click", function(event){
     map.setZoom(15);
@@ -75,9 +79,49 @@ function initAutocomplete() {
   }
 
   function redoSearchResults() {
-    for (var i = 0; i < allResults.length; i++) {
-      console.log(allResults[i]);
+    if(!allResults.length)
+      return false;
+
+    var resultLimitInput = document.getElementById('result-limit-num');
+    if(resultLimitInput.value === 0)
+      resultLimitInput.value = 1;
+
+    function redoResultSearch(index) {
+      var result = allResults[index];
+      result.markers.forEach(function(marker) {
+        marker.setMap(null);
+        delete allMarkers[marker.id];
+      });
+      result.places = [];
+      result.markers = [];
+      // redo search with result.searchTerm, then addMarkersToMap
+      var request = {
+        location: userLocationMarker.getPosition(),
+        radius: '30',
+        query: result.searchTerm
+      };
+
+      placesService.textSearch(request, function(results, status) {
+        if (status == google.maps.places.PlacesServiceStatus.OK) {
+          result.places = results;
+          var resultText = result.places.length === 1 || resultLimitInput.value === 1 ? '' : result.places.length >= resultLimitInput.value ? '<div class="result-amount">' + resultLimitInput.value +' results</div>' : '<div class="result-amount">' + result.places.length +' results</div>';
+          document.getElementById(result.id).innerHTML = result.searchTerm + resultText;
+          addMarkersToMap(result.places, result, resultLimitInput, result.color);
+        }
+        // check if last result, else run again
+        if(index === allResults.length - 1){
+          var bounds = new google.maps.LatLngBounds();
+          for (var i in allMarkers) {
+            bounds.extend(allMarkers[i].getPosition());
+          }
+          bounds.extend(userLocationMarker.getPosition());
+          map.fitBounds(bounds);
+        }else{
+          redoResultSearch(index + 1);
+        }
+      });
     }
+    redoResultSearch(0);
   }
 
   function setLocationSearchbox() {
@@ -114,65 +158,16 @@ function initAutocomplete() {
       map.setCenter(places[0].geometry.location);
       userLocationMarker = marker;
       setMap();
-
       // redo past searches
       redoSearchResults();
     });
   }
 
-  function setMap(){
-    document.body.setAttribute('location-set', true);
-    google.maps.event.clearInstanceListeners(input);
-    input.setAttribute("placeholder", "Search...");
-    input.setAttribute("style", "");
-    input.value = "";
-    input.focus();
-
-    var searchBoxOptions = {
-      bounds: new google.maps.Circle({center: userLocationMarker.getPosition(), radius: 30}).getBounds()
-    };
-
-    var resultLimitInput = document.getElementById('result-limit-num'),
-    searchBox = new google.maps.places.SearchBox(input, searchBoxOptions),
-    infowindow = new google.maps.InfoWindow(),
-    detailService = new google.maps.places.PlacesService(map);
-    input.setAttribute("style", "");
-
-    map.addListener('click', function() {
-      input.blur();
-      infowindow.close();
-    });
-
-    // Listen for the event fired when the user selects a prediction and retrieve
-    // more details for that place.
-    searchBox.addListener('places_changed', function() {
-      var places = searchBox.getPlaces();
-      resultLimitInput.value = Math.round(resultLimitInput.value);
-      if (places.length == 0) {
-        return;
-      }
-
-      // create result
-      var searchTerm = input.value,
-      color = getRandomColor(),
-      results = places.length === 1 ? '' : places.length >= resultLimitInput.value ? '<div class="result-amount">' + resultLimitInput.value +' results</div>' : '<div class="result-amount">' + places.length +' results</div>';
-
-      var result = createResult({
-        searchTerm: searchTerm,
-        content: '<div class="result-text">' + searchTerm + results + '</div><button class="remove-result" type="button">×</button>',
-        color: color,
-        markers: []
-      });
-
-      // For each place, get the icon, name and location.
-      var bounds = new google.maps.LatLngBounds();
-      places.forEach(function(place, index) {
-        if(index >= resultLimitInput.value)
-          return false;
+  function addMarkersToMap(places, result, resultLimitInput, color) {
+    places.forEach(function(place, index) {
+      if(index < resultLimitInput.value){
 
         var resultColor = color;
-        if(selectedArea)
-          resultColor = google.maps.geometry.poly.containsLocation(place.geometry.location, selectedArea) ? color : 'rgba(0,0,0,.15)';
 
         var icon = {
           path: "M19.39,1.562c-2.505-1.238-5.94-0.477-8.377,1.643C8.576,1.085,5.141,0.323,2.636,1.562 C-0.357,3.039-0.88,6.782,1.474,9.924l1.962,2.065l0.402,0.425l7.174,7.56l7.174-7.56l0.402-0.425l1.963-2.065 C22.906,6.782,22.383,3.039,19.39,1.562z",
@@ -199,7 +194,7 @@ function initAutocomplete() {
             placeId: place.place_id
           };
 
-          detailService.getDetails(request, detailCallback);
+          placesService.getDetails(request, detailCallback);
 
           function detailCallback(placeDetail, status) {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
@@ -223,7 +218,59 @@ function initAutocomplete() {
 
         allMarkers[marker.id] = marker;
         result.markers.push(marker);
+      }
+    });
+  };
+
+  function setMap(){
+    document.body.setAttribute('location-set', true);
+    google.maps.event.clearInstanceListeners(input);
+    input.setAttribute("placeholder", "Search...");
+    input.setAttribute("style", "");
+    input.value = "";
+    input.focus();
+
+    var searchBoxOptions = {
+      bounds: new google.maps.Circle({center: userLocationMarker.getPosition(), radius: 30}).getBounds()
+    };
+    var searchBox = new google.maps.places.SearchBox(input, searchBoxOptions);
+    input.setAttribute("style", "");
+    map.addListener('click', function() {
+      input.blur();
+      infowindow.close();
+    });
+
+    // Listen for the event fired when the user selects a prediction and retrieve
+    // more details for that place.
+    searchBox.addListener('places_changed', function() {
+      var places = searchBox.getPlaces();
+      resultLimitInput.value = Math.round(resultLimitInput.value);
+      if(resultLimitInput.value === 0)
+        resultLimitInput.value = 1;
+
+      if (places.length === 0) {
+        alert('No search results!');
+        return false;
+      }
+
+      // create result
+      var searchTerm = input.value,
+      color = getRandomColor(),
+      results = places.length === 1 ? '' : places.length >= resultLimitInput.value ? '<div class="result-amount">' + resultLimitInput.value +' results</div>' : '<div class="result-amount">' + places.length +' results</div>',
+      resultId = 'result'+Date.now();
+
+      var result = createResult({
+        id: resultId,
+        searchTerm: searchTerm,
+        content: '<div id="'+resultId+'" class="result-text">' + searchTerm + results + '</div><button class="remove-result" type="button">×</button>',
+        color: color,
+        markers: [],
+        places: places
       });
+
+      var bounds = new google.maps.LatLngBounds();
+
+      addMarkersToMap(places, result, resultLimitInput, color);
 
       for (var i in allMarkers) {
         bounds.extend(allMarkers[i].getPosition());
@@ -287,8 +334,8 @@ function getRandomColor() {
 
 function createResult(result){
   var resultsWrap = document.getElementById('results-wrap'),
-  resultElement = document.createElement("div");
-  resultElement.className = "result";
+  resultElement = document.createElement('div');
+  resultElement.className = 'result';
   resultElement.innerHTML = result.content;
   resultElement.style.background = result.color;
 
@@ -308,7 +355,7 @@ function createResult(result){
   };
 
   checkColorArray();
-  allResults.push(result.searchTerm);
+  allResults.push(result);
 
   function removeResult (event) {
     event.preventDefault();
@@ -316,7 +363,7 @@ function createResult(result){
       marker.setMap(null);
       delete allMarkers[marker.id];
     });
-    allResults.splice(allResults.indexOf(result.searchTerm), 1);
+    allResults.splice(allResults.indexOf(result), 1);
     resultElement.parentNode.removeChild(resultElement);
     resultElement = null;
     if(result.color !== undefined)
