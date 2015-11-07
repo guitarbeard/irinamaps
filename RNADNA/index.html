@@ -24,6 +24,10 @@
         <div class="cover-container">
           <div class="inner cover">
             <div class="input-group">
+              <span class="input-group-addon">
+                <span>RNA</span>
+                <input id="RNAinput" type="checkbox" aria-label="RNA">
+              </span>
               <input id="dnaInput" type="text" class="form-control" placeholder="ATCGCTAA...">
               <span class="input-group-btn">
                 <button id="getBasePairsBtn" class="btn btn-default" type="button">Get base pairs!</button>
@@ -41,7 +45,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
     <script>
       $(function(){
-        function returnBasePair(base) {
+
+        function returnDNABasePair(base) {
           switch (base) {
             case "A":
               return "T";
@@ -59,28 +64,53 @@
               return "";
           }
         }
-        $('#getBasePairsBtn').click(function(){
+
+        function returnRNABasePair(base) {
+          switch (base) {
+            case "A":
+              return "U";
+              break;
+            case "U":
+              return "A";
+              break;
+            case "C":
+              return "G";
+              break;
+            case "G":
+              return "C";
+              break;
+            default:
+              return "";
+          }
+        }
+
+        function returnBasePair(base){
+          if($('#RNAinput').prop('checked')){
+            return returnRNABasePair(base);
+          }else{
+            return returnDNABasePair(base);
+          }
+        }
+
+        function getBasePairs() {
           var dnaInputVal = $('#dnaInput').val();
           var dnaArray = dnaInputVal.split("");
           var dnaOutput = "";
           for (var i = 0; i < dnaArray.length; i++) {
-            var base = dnaArray[i].toUpperCase();
-            dnaOutput += returnBasePair(base);
+            dnaOutput += returnBasePair(dnaArray[i].toUpperCase());
           }
           $('#basePairOutput').text(dnaOutput);
+        }
+
+        $('#getBasePairsBtn').click(function(){
+          getBasePairs();
         });
+
         $('#dnaInput').keyup(function(e){
           e.preventDefault();
           if(e.keyCode !== 13)
             return false;
-          var dnaInputVal = $('#dnaInput').val();
-          var dnaArray = dnaInputVal.split("");
-          var dnaOutput = "";
-          for (var i = 0; i < dnaArray.length; i++) {
-            var base = dnaArray[i].toUpperCase();
-            dnaOutput += returnBasePair(base);
-          }
-          $('#basePairOutput').text(dnaOutput);
+          getBasePairs();
         });
       });
     </script>
