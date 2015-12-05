@@ -1,0 +1,20 @@
+{
+  "name": "irinamaps",
+  "version": "0.0.0",
+  "homepage": "https://github.com/guitarbeard/irinamaps",
+  "authors": [
+    "Alex Medina <alxdna@gmail.com>"
+  ],
+  "description": "multi search using google maps",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#~1.2.3"
+  }
+}
