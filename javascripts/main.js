@@ -9,7 +9,7 @@ userLocationMarker = null;
 function initAutocomplete() {
   // Create the search box and link it to the UI element.
   var input = document.getElementById('pac-input');
-  var defaultLocation = {lat: 33.682, lng: -117.890};
+  var defaultLocation = {lat: 33.690, lng: -117.887};
   var map = new google.maps.Map(document.getElementById('map'), {
     center: defaultLocation,
     zoom: 15,
