@@ -1,10 +1,21 @@
 // This example adds a search box to a map, using the Google Place Autocomplete
 // feature. People can enter geographical searches. The search box will return a
 // pick list containing a mix of places and predicted search terms.
-var colorArray = ['#7BB5E1', '#8379A7', '#2B9A77', '#C758A5', '#EDBA32', '#8F6456', '#D25441', '#73215F', '#0065BA'],
+var colorArray = [
+  '#E91E63',
+  '#9C27B0',
+  '#3F51B5',
+  '#2196F3',
+  '#009688',
+  '#8BC34A',
+  '#FFC107',
+  '#FF9800',
+  '#FF5722'
+],
 allMarkers = {},
 allResults = [],
-userLocationMarker = null;
+userLocationMarker = null,
+notification;
 
 function initAutocomplete() {
   // Create the search box and link it to the UI element.
@@ -23,8 +34,8 @@ function initAutocomplete() {
   toggleResultsButton = document.getElementById('toggle-results')
   resultLimitInput = document.getElementById('result-limit-num'),
   infowindow = new google.maps.InfoWindow(),
-  placesService = new google.maps.places.PlacesService(map);
-
+  placesService = new google.maps.places.PlacesService(map),
+  notification = document.querySelector('.mdl-js-snackbar');
 
   google.maps.event.addDomListener(takeMeHomeButton, "click", function(event){
     map.setZoom(15);
@@ -33,16 +44,6 @@ function initAutocomplete() {
 
   google.maps.event.addDomListener(editHomeButton, "click", function(event){
     setLocationSearchbox();
-  });
-
-  google.maps.event.addDomListener(toggleResultsButton, "click", function(event){
-    if(document.body.getAttribute('show-results') === 'true'){
-      document.body.setAttribute('show-results', false);
-      toggleResultsButton.innerHTML = 'show list';
-    }else{
-      document.body.setAttribute('show-results', true);
-      toggleResultsButton.innerHTML = 'hide list';
-    }
   });
 
   // Try HTML5 geolocation.
@@ -249,7 +250,11 @@ function initAutocomplete() {
         resultLimitInput.value = 1;
 
       if (places.length === 0) {
-        alert('No search results!');
+        notification.MaterialSnackbar.showSnackbar(
+          {
+            message: 'No results found :('
+          }
+        );
         return false;
       }
 
@@ -262,7 +267,7 @@ function initAutocomplete() {
       var result = createResult({
         id: resultId,
         searchTerm: searchTerm,
-        content: '<div id="'+resultId+'" class="result-text">' + searchTerm + results + '</div><button class="remove-result" type="button">×</button>',
+        content: '<span id="'+resultId+'" class="result-text mdl-list__item-primary-content">' + searchTerm + results + '</span><span clas="mdl-list__item-secondary-content"><button class="mdl-button mdl-js-button mdl-button--icon remove-result"><i class="material-icons">clear</i></button></span>',
         color: color,
         markers: [],
         places: places
@@ -334,8 +339,8 @@ function getRandomColor() {
 
 function createResult(result){
   var resultsWrap = document.getElementById('results-wrap'),
-  resultElement = document.createElement('div');
-  resultElement.className = 'result';
+  resultElement = document.createElement('li');
+  resultElement.classList.add('result','mdl-list__item','mdl-list__item--two-line');
   resultElement.innerHTML = result.content;
   resultElement.style.background = result.color;
 
