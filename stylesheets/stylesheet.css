@@ -10,6 +10,10 @@ html, body {
   width: 345px;
 }
 
+.directions_btn {
+  margin-top: 10px;
+}
+
 #edit-home, #take-me-home {
   width: 28px!important;
   min-width: 28px!important;

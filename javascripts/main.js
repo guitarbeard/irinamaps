@@ -319,16 +319,17 @@ function buildInfoWindowHtml(place) {
     phone = "<br><a href='tel:" + place.formatted_phone_number + "'>" + place.formatted_phone_number + "</a>";
 
   var website = "";
-  if(place.website || place.url){
-    var site = place.website ? place.website : place.url;
-    website = "<br><a class='website' href='" + site + "'>" + site + "</a>";
+  if(place.website){
+    website = "<br><a class='website' href='" + place.website + "' target='_blank'>" + place.website + "</a>";
   }
 
   var open_now = "";
   if(place.opening_hours)
     open_now = place.opening_hours.open_now ? "<br><span class='openNow'>Open meow!</span>" : "<br><span class='closedNow'>closed :(</span>";
 
-  return photo + name + remove + address + phone + website + open_now;
+  var directions_link = '<br><a class="btn btn-default btn-block btn-small directions_btn" href="'+place.url+'" target="_blank">Get Directions</a>'
+
+  return photo + name + remove + address + phone + website + open_now + directions_link;
 }
 
 function randomIntFromInterval(min,max) {
