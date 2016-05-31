@@ -8,8 +8,8 @@ var colorArray = [
   '#2196F3',
   '#009688',
   '#8BC34A',
-  '#FFC107',
-  '#FF9800',
+  '#FFEB3B',
+  '#795548',
   '#FF5722'
 ],
 map,
@@ -351,16 +351,14 @@ function createResult(result){
   function checkColorArray () {
     if(colorArray.length === 0){
       document.body.setAttribute('full', true);
+      notification.MaterialSnackbar.showSnackbar(
+        {
+          message: 'Max searches reached!'
+        }
+      );
     }else{
       document.body.setAttribute('full', false);
     }
-
-    if(colorArray.length !== 9){
-      document.body.setAttribute('has-results', true);
-    }else{
-      document.body.setAttribute('has-results', false);
-    }
-
   };
 
   checkColorArray();

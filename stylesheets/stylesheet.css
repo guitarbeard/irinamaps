@@ -58,10 +58,11 @@ html, body {
   padding: 0;
   margin-bottom: 0;
   max-height: calc(100% - 131px);
-  overflow-y: auto;
+  overflow-y: hidden;
+  display: none;
 }
 
-body[location-set="true"] #take-me-home, body[location-set="true"] #edit-home{
+body[location-set="true"] #take-me-home, body[location-set="true"] #edit-home, body[location-set="true"] #results-wrap{
   display: block;
 }
 
@@ -191,6 +192,10 @@ body[location-set='true'] #result-limit-num-wrap{
   box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
 }
 
+.mdl-layout__drawer.is-visible #results-wrap {
+  overflow-y: auto;
+}
+
 .mdl-layout__drawer-button {
   margin: 4px;
   color: rgba(0,0,0,.5);
@@ -208,7 +213,7 @@ body[location-set='true'] #result-limit-num-wrap{
   border-color: #4d90fe;
 }
 
-body[full="true"] #pac-input, body[full="true"] #result-limit-num-wrap{
+body[full="true"] #pac-input {
   display: none;
 }
 
