@@ -18,7 +18,7 @@ html, body {
   position: absolute;
   z-index: 1;
   right: 0;
-  margin-right: 12px;
+  margin-right: 10px;
   background-color: #FAFAFA;
   border-radius: 2px 2px 0 0;
   height: 28px!important;
@@ -26,7 +26,7 @@ html, body {
 
 #edit-home {
   border-bottom: #E6E6E6 solid thin;
-  bottom: 158px;
+  bottom: 128px;
 }
 
 #edit-home .material-icons {
@@ -36,7 +36,7 @@ html, body {
 
 #take-me-home {
   border-radius: 0 0 2px 2px;
-  bottom: 130px;
+  bottom: 100px;
 }
 
 .controls {

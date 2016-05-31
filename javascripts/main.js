@@ -26,7 +26,9 @@ function initAutocomplete() {
     center: defaultLocation,
     zoom: 15,
     mapTypeId: google.maps.MapTypeId.ROADMAP,
-    mapTypeControl: false
+    mapTypeControl: false,
+    disableDefaultUI: true,
+    zoomControl: true
   });
 
 
