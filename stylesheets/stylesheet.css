@@ -9,34 +9,34 @@ html, body {
 #target {
   width: 345px;
 }
-#take-me-home{
+
+#edit-home, #take-me-home {
+  width: 28px!important;
+  min-width: 28px!important;
+  color: #666666;
   display: none;
   position: absolute;
-  z-index: 1;
-  right: 0;
-  margin-right: 12px;
-  bottom: 130px;
-}
-
-.gm-bundled-control-on-bottom {
-  right: 44px!important;
-}
-
-#edit-home{
-  color: #B9B9B9;
-  display: none;
-  position: absolute;
-  bottom: 195px;
   z-index: 1;
   right: 0;
   margin-right: 12px;
   background-color: #FAFAFA;
+  border-radius: 2px 2px 0 0;
+  height: 28px!important;
+}
+
+#edit-home {
+  border-bottom: #E6E6E6 solid thin;
+  bottom: 158px;
 }
 
 #edit-home .material-icons {
-  font-size: 46px;
-  -webkit-transform: translate(-23px,-12px);
-  transform: translate(-23px,-12px);
+  -webkit-transform: translate(-12px,-12px);
+  transform: translate(-12px,-12px);
+}
+
+#take-me-home {
+  border-radius: 0 0 2px 2px;
+  bottom: 130px;
 }
 
 .controls {
@@ -65,6 +65,9 @@ body[location-set="true"] #take-me-home, body[location-set="true"] #edit-home{
   margin-top: 5px;
   color: white;
   position: relative;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  height: 48px;
 }
 
 .result:first-child {

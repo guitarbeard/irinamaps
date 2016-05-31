@@ -16,7 +16,7 @@
       <div class="mdl-layout__drawer">
         <form id="result-limit-num-wrap" action="#">
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-            <input id="result-limit-num" class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" value="30">
+            <input id="result-limit-num" class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" value="10">
             <label class="mdl-textfield__label" for="result-limit-num">Max Results</label>
             <span class="mdl-textfield__error">Input is not a number!</span>
           </div>
@@ -26,9 +26,9 @@
       </div>
       <main class="mdl-layout__content">
         <div id="map"></div>
-        <button id="edit-home" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect"><i class="material-icons">edit_location</i></button>
+        <button id="edit-home" class="mdl-button mdl-js-button mdl-button--fab"><i class="material-icons">edit_location</i></button>
         <div class="mdl-tooltip" for="edit-home">Edit Location</div>
-        <button id="take-me-home" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" type="button"><i class="material-icons">my_location</i></button>
+        <button id="take-me-home" class="mdl-button mdl-js-button mdl-button--fab" type="button"><i class="material-icons">my_location</i></button>
         <div class="mdl-tooltip" for="take-me-home">My Location</div>
       </main>
     </div>
