@@ -12,6 +12,7 @@ var colorArray = [
   '#FF9800',
   '#FF5722'
 ],
+map,
 allMarkers = {},
 allResults = [],
 userLocationMarker = null,
@@ -21,7 +22,7 @@ function initAutocomplete() {
   // Create the search box and link it to the UI element.
   var input = document.getElementById('pac-input');
   var defaultLocation = {lat: 33.690, lng: -117.887};
-  var map = new google.maps.Map(document.getElementById('map'), {
+  map = new google.maps.Map(document.getElementById('map'), {
     center: defaultLocation,
     zoom: 15,
     mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -267,7 +268,7 @@ function initAutocomplete() {
       var result = createResult({
         id: resultId,
         searchTerm: searchTerm,
-        content: '<span id="'+resultId+'" class="result-text mdl-list__item-primary-content">' + searchTerm + results + '</span><span clas="mdl-list__item-secondary-content"><button class="mdl-button mdl-js-button mdl-button--icon remove-result"><i class="material-icons">clear</i></button></span>',
+        content: '<button id="'+resultId+'" class="result-text mdl-list__item-primary-content mdl-button mdl-js-button">' + searchTerm + results + '</button><span clas="mdl-list__item-secondary-content"><button class="mdl-button mdl-js-button mdl-button--icon remove-result"><i class="material-icons">clear</i></button></span>',
         color: color,
         markers: [],
         places: places
@@ -377,9 +378,25 @@ function createResult(result){
     checkColorArray();
   };
 
+  function focusResult (event) {
+    event.preventDefault();
+    var bounds = new google.maps.LatLngBounds();
+
+    result.markers.forEach(function(marker) {
+      bounds.extend(marker.getPosition());
+    });
+
+    bounds.extend(userLocationMarker.getPosition());
+    map.fitBounds(bounds);
+  };
+
   var removeBtn = resultElement.getElementsByClassName("remove-result")[0];
   removeBtn.addEventListener("click", removeResult);
   removeBtn.addEventListener("touchend", removeResult);
+
+  var resultElementText = resultElement.getElementsByClassName("result-text")[0];
+  resultElementText.addEventListener("click", focusResult);
+  resultElementText.addEventListener("touchend", focusResult);
 
   // Prepend it to the parent element
   resultsWrap.insertBefore(resultElement, resultsWrap.firstChild);
