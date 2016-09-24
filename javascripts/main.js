@@ -217,6 +217,74 @@ function initAutocomplete() {
               marker.setMap(null);
               delete allMarkers[marker.id];
             });
+
+            var keepBtn = document.getElementById('keep' + place.place_id);
+            google.maps.event.addDomListener(keepBtn, "click", function(event){
+              event.preventDefault();
+              for (var markerId in allMarkers) {
+                if (allMarkers.hasOwnProperty(markerId)) {
+                  var allMarker = allMarkers[markerId];
+                  if(allMarker.resultColor === marker.resultColor) {
+                    if(allMarker.id !== marker.id) {
+                      allMarker.setMap(null);
+                      delete allMarkers[allMarker.id];
+                      // remove from result markers
+                      allResults.forEach(function(result, index) {
+                        if(result.color === marker.resultColor) {
+                          result.markers.forEach(function(allMarker){
+                            if(allMarker.id !== marker.id)
+                              result.markers.splice(result.markers.indexOf(allMarker), 1);
+                          });
+                          result.places.forEach(function(allPlace){
+                            if(allPlace.place_id !== marker.id)
+                              result.places.splice(result.places.indexOf(allPlace), 1);
+                          });
+                        }
+                      });
+                    }
+                  }
+                }
+              }
+              var bounds = new google.maps.LatLngBounds();
+              for (var i in allMarkers) {
+                bounds.extend(allMarkers[i].getPosition());
+              }
+              bounds.extend(userLocationMarker.getPosition());
+              map.fitBounds(bounds);
+            });
+            google.maps.event.addDomListener(keepBtn, "touchend", function(event){
+              event.stopPropagation();
+              for (var markerId in allMarkers) {
+                if (allMarkers.hasOwnProperty(markerId)) {
+                  var allMarker = allMarkers[markerId];
+                  if(allMarker.resultColor === marker.resultColor) {
+                    if(allMarker.id !== marker.id) {
+                      allMarker.setMap(null);
+                      delete allMarkers[allMarker.id];
+                      // remove from result markers
+                      allResults.forEach(function(result, index) {
+                        if(result.color === marker.resultColor) {
+                          result.markers.forEach(function(allMarker){
+                            if(allMarker.id !== marker.id)
+                              result.markers.splice(result.markers.indexOf(allMarker), 1);
+                          });
+                          result.places.forEach(function(allPlace){
+                            if(allPlace.place_id !== marker.id)
+                              result.places.splice(result.places.indexOf(allPlace), 1);
+                          });
+                        }
+                      });
+                    }
+                  }
+                }
+              }
+              var bounds = new google.maps.LatLngBounds();
+              for (var i in allMarkers) {
+                bounds.extend(allMarkers[i].getPosition());
+              }
+              bounds.extend(userLocationMarker.getPosition());
+              map.fitBounds(bounds);
+            });
           }
         });
 
@@ -299,8 +367,6 @@ function buildInfoWindowHtml(place) {
 
   var name = "<strong>" + place.name + "</strong>";
 
-  var remove = "<button id='remove" + place.place_id + "' type='button' class='btn btn-danger btn-xs remove-single-result'>remove</button>";
-
   var address = "";
   for (var i = 0; i < place.address_components.length; i++) {
     if(i === 0)
@@ -327,9 +393,11 @@ function buildInfoWindowHtml(place) {
   if(place.opening_hours)
     open_now = place.opening_hours.open_now ? "<br><span class='openNow'>Open meow!</span>" : "<br><span class='closedNow'>closed :(</span>";
 
-  var directions_link = '<br><a class="btn btn-default btn-block btn-small directions_btn" href="'+place.url+'" target="_blank">Get Directions</a>'
+  var remove = "<div class='btn-group btn-group-justified' role='group' aria-label='remove buttons'><div class='btn-group' role='group'><button id='remove" + place.place_id + "' type='button' class='btn btn-danger'>remove</button></div><div class='btn-group' role='group'><button id='keep" + place.place_id + "' type='button' class='btn btn-success'>keep only</button></div></div>";
 
-  return photo + name + remove + address + phone + website + open_now + directions_link;
+  var directions_link = '<a class="btn btn-default btn-block btn-small directions_btn" href="'+place.url+'" target="_blank">Get Directions</a>'
+
+  return photo + name  + address + phone + website + open_now + remove + directions_link;
 }
 
 function randomIntFromInterval(min,max) {
