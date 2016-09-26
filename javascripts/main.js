@@ -369,7 +369,7 @@ function buildInfoWindowHtml(place) {
   if(place.opening_hours)
     open_now = place.opening_hours.open_now ? "<br><span class='openNow'>Open meow!</span>" : "<br><span class='closedNow'>closed :(</span>";
 
-  var remove = "<div class='btn-group btn-group-justified' role='group' aria-label='remove buttons'><div class='btn-group' role='group'><button id='remove" + place.place_id + "' type='button' class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect btn-danger'>remove</button></div><div class='btn-group' role='group'><button id='keep" + place.place_id + "' type='button' class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect btn-success'>keep only</button></div></div>";
+  var remove = "<div class='btn-group btn-group-justified' role='group' aria-label='remove buttons'><div class='btn-group' role='group'><button id='remove" + place.place_id + "' type='button' class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect btn-danger btn'>remove</button></div><div class='btn-group' role='group'><button id='keep" + place.place_id + "' type='button' class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect btn-success btn'>keep only</button></div></div>";
 
   var directions_link = '<a class="btn-block mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect directions-btn" href="'+place.url+'" target="_blank">Get Directions</a>'
 
