@@ -219,7 +219,8 @@ function initAutocomplete() {
             });
 
             var keepBtn = document.getElementById('keep' + place.place_id);
-            google.maps.event.addDomListener(keepBtn, "click", function(event){
+            var keepOnly = function(event) {
+              event.stopPropagation();
               event.preventDefault();
               for (var markerId in allMarkers) {
                 if (allMarkers.hasOwnProperty(markerId)) {
@@ -251,39 +252,14 @@ function initAutocomplete() {
               }
               bounds.extend(userLocationMarker.getPosition());
               map.fitBounds(bounds);
+              infowindow.close();
+            }
+
+            google.maps.event.addDomListener(keepBtn, "click", function(event){
+              keepOnly(event);
             });
             google.maps.event.addDomListener(keepBtn, "touchend", function(event){
-              event.stopPropagation();
-              for (var markerId in allMarkers) {
-                if (allMarkers.hasOwnProperty(markerId)) {
-                  var allMarker = allMarkers[markerId];
-                  if(allMarker.resultColor === marker.resultColor) {
-                    if(allMarker.id !== marker.id) {
-                      allMarker.setMap(null);
-                      delete allMarkers[allMarker.id];
-                      // remove from result markers
-                      allResults.forEach(function(result, index) {
-                        if(result.color === marker.resultColor) {
-                          result.markers.forEach(function(allMarker){
-                            if(allMarker.id !== marker.id)
-                              result.markers.splice(result.markers.indexOf(allMarker), 1);
-                          });
-                          result.places.forEach(function(allPlace){
-                            if(allPlace.place_id !== marker.id)
-                              result.places.splice(result.places.indexOf(allPlace), 1);
-                          });
-                        }
-                      });
-                    }
-                  }
-                }
-              }
-              var bounds = new google.maps.LatLngBounds();
-              for (var i in allMarkers) {
-                bounds.extend(allMarkers[i].getPosition());
-              }
-              bounds.extend(userLocationMarker.getPosition());
-              map.fitBounds(bounds);
+              keepOnly(event);
             });
           }
         });
@@ -317,7 +293,7 @@ function initAutocomplete() {
     searchBox.addListener('places_changed', function() {
       var places = searchBox.getPlaces();
       resultLimitInput.value = Math.round(resultLimitInput.value);
-      if(resultLimitInput.value === 0)
+      if(resultLimitInput.value == 0)
         resultLimitInput.value = 1;
 
       if (places.length === 0) {
@@ -393,9 +369,9 @@ function buildInfoWindowHtml(place) {
   if(place.opening_hours)
     open_now = place.opening_hours.open_now ? "<br><span class='openNow'>Open meow!</span>" : "<br><span class='closedNow'>closed :(</span>";
 
-  var remove = "<div class='btn-group btn-group-justified' role='group' aria-label='remove buttons'><div class='btn-group' role='group'><button id='remove" + place.place_id + "' type='button' class='btn btn-danger'>remove</button></div><div class='btn-group' role='group'><button id='keep" + place.place_id + "' type='button' class='btn btn-success'>keep only</button></div></div>";
+  var remove = "<div class='btn-group btn-group-justified' role='group' aria-label='remove buttons'><div class='btn-group' role='group'><button id='remove" + place.place_id + "' type='button' class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect btn-danger'>remove</button></div><div class='btn-group' role='group'><button id='keep" + place.place_id + "' type='button' class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect btn-success'>keep only</button></div></div>";
 
-  var directions_link = '<a class="btn btn-default btn-block btn-small directions_btn" href="'+place.url+'" target="_blank">Get Directions</a>'
+  var directions_link = '<a class="btn-block mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect directions-btn" href="'+place.url+'" target="_blank">Get Directions</a>'
 
   return photo + name  + address + phone + website + open_now + remove + directions_link;
 }

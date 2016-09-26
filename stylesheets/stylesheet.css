@@ -10,7 +10,7 @@ html, body {
   width: 345px;
 }
 
-.directions_btn {
+.directions-btn {
   margin-top: 10px;
 }
 
@@ -139,6 +139,10 @@ body[location-set="true"] #take-me-home, body[location-set="true"] #edit-home, b
   display: inline-block;
 }
 
+.mdl-tooltip {
+  will-change: auto!important;
+}
+
 .placeRating, .placePrice{
   float: right;
   margin-left: 5px!important;
@@ -150,8 +154,10 @@ body[location-set="true"] #take-me-home, body[location-set="true"] #edit-home, b
   padding: 0 20px;
 }
 
-#result-limit-num-wrap mdl-textfield{
-  padding: 20px;
+.mdl-textfield__error {
+  background: #bbbbbb;
+  width: 100%;
+  text-align: center;
 }
 
 body[location-set='true'] #result-limit-num-wrap{
