@@ -1,0 +1,37 @@
+#result-limit-num-wrap {
+  /*display: none;*/
+  margin-top: 60px;
+  padding: 0 20px;
+}
+
+.mdl-textfield__error {
+  background: #bbbbbb;
+  width: 100%;
+  text-align: center;
+}
+
+body[location-set='true'] #result-limit-num-wrap{
+  display: block;
+}
+
+#result-limit-num, #result-limit-num .mdl-textfield__input {
+  color: white;
+  border-bottom-color: white;
+}
+
+#result-limit-num-wrap label {
+  color: white;
+}
+
+#result-limit-num-wrap label:after {
+  bottom: 16px;
+  background-color: white;
+}
+
+#results-wrap {
+  padding: 0;
+  margin-bottom: 0;
+  max-height: calc(100% - 131px);
+  overflow-y: hidden;
+  display: none;
+}

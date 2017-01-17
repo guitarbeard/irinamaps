@@ -3,8 +3,10 @@ html, body {
   margin: 0;
   padding: 0;
 }
-#map, .mdl-layout__content {
+
+#App, #map, .mdl-layout__content {
   height: 100%;
+  width: 100%;
 }
 #target {
   width: 345px;
@@ -54,52 +56,8 @@ html, body {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-#results-wrap{
-  padding: 0;
-  margin-bottom: 0;
-  max-height: calc(100% - 131px);
-  overflow-y: hidden;
-  display: none;
-}
-
 body[location-set="true"] #take-me-home, body[location-set="true"] #edit-home, body[location-set="true"] #results-wrap{
   display: block;
-}
-
-.result{
-  margin-top: 5px;
-  color: white;
-  position: relative;
-  height: 48px;
-  padding: 0 8px 0 0;
-}
-
-.result-text {
-  font-size: 14px;
-  color: white;
-  text-transform: none;
-  text-align: left;
-  padding: 8px 16px;
-  height: 48px!important;
-  margin-right: 8px;
-  line-height: 16px!important;
-  border-radius: 0;
-}
-
-.mdl-layout__drawer[aria-hidden='true'] .result {
-  padding-right: 0;
-}
-
-.mdl-layout__drawer[aria-hidden='true'] .result-text {
-  margin-right: 0;
-}
-
-.result:first-child {
-  margin-top: 0;
-}
-
-.result-amount{
-  font-size: 11px;
 }
 
 .infoWindow{
@@ -148,50 +106,6 @@ body[location-set="true"] #take-me-home, body[location-set="true"] #edit-home, b
   margin-left: 5px!important;
 }
 
-#result-limit-num-wrap {
-  display: none;
-  margin-top: 60px;
-  padding: 0 20px;
-}
-
-.mdl-textfield__error {
-  background: #bbbbbb;
-  width: 100%;
-  text-align: center;
-}
-
-body[location-set='true'] #result-limit-num-wrap{
-  display: block;
-}
-
-#result-limit-num {
-  color: white;
-  border-bottom-color: white;
-}
-
-#result-limit-num-wrap label {
-  color: white;
-}
-
-#result-limit-num-wrap label:after {
-  bottom: 16px;
-  background-color: white;
-}
-
-#pac-input {
-  top: 0;
-  position: fixed;
-  background-color: #fff;
-  font-family: Roboto;
-  font-size: 15px;
-  font-weight: 300;
-  padding: 20px 25px 20px 50px;
-  text-overflow: ellipsis;
-  width: 216px;
-  margin-left: 12px;
-  z-index: 6;
-}
-
 .mdl-layout__drawer {
   border-right: none;
   left: 40px;
@@ -223,21 +137,13 @@ body[location-set='true'] #result-limit-num-wrap{
   margin: 4px;
   color: rgba(0,0,0,.5);
   z-index: 6;
-  padding-top: 5px;
-  padding-left: 15px;
+  padding-top: 3px;
+  padding-left: 8px;
   outline: none;
 }
 
 .mdl-layout__obfuscator.is-visible {
   opacity: 0;
-}
-
-#pac-input:focus {
-  border-color: #4d90fe;
-}
-
-body[full="true"] #pac-input {
-  display: none;
 }
 
 .pac-container {
