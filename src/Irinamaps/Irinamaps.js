@@ -1,15 +1,35 @@
-/* global google */
-import {
-  default as React,
-  Component,
-} from 'react';
+/* global google, navigator */
+import  React, { Component } from 'react';
 
 import { withGoogleMap, GoogleMap, Marker } from 'react-google-maps';
 
+import SearchBox from "../SearchBox";
+
 import { Layout, Drawer, Content } from 'react-mdl';
 
-import SearchBox from './SearchBox';
 import Sidebar from './Sidebar';
+
+const INPUT_STYLE = {
+  top: `0`,
+  position: `fixed`,
+  backgroundColor: `#fff`,
+  fontFamily: `Roboto`,
+  fontSize: `15px`,
+  fontWeight: `300`,
+  padding: `20px 25px 20px 50px`,
+  textOverflow: `ellipsis`,
+  width: `216px`,
+  marginLeft: `12px`,
+  zIndex: `6`,
+  boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
+  borderRadius: `2px 0 0 2px`,
+  outline: `none`,
+  boxSizing: `border-box`,
+  MozBoxSizing: `border-box`,
+  border: `1px solid transparent`,
+  height: `32px`,
+  marginTop: `10px`
+};
 
 const GoogleMapComponent = withGoogleMap(props => (
   <GoogleMap
@@ -24,7 +44,18 @@ const GoogleMapComponent = withGoogleMap(props => (
       zoomControl:true
     }}
   >
+    <SearchBox
+      ref={props.onSearchBoxMounted}
+      bounds={props.bounds}
+      controlPosition={google.maps.ControlPosition.TOP_LEFT}
+      onPlacesChanged={props.onPlacesChanged}
+      inputPlaceholder={props.placeholder}
+      inputStyle={INPUT_STYLE}
+    />
     {props.markers.map((marker, index) => (
+      <Marker position={marker.position} key={index} onClick={() => props.onMarkerClick(marker)} />
+    ))}
+    {props.userLocationMarker.map((marker, index) => (
       <Marker position={marker.position} key={index} onClick={() => props.onMarkerClick(marker)} />
     ))}
   </GoogleMap>
@@ -38,12 +69,11 @@ const icon = {
   anchor: new google.maps.Point(11, 11)
 };
 
-export default class IrinaMaps extends Component {
+class Irinamaps extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      placeholder: 'Set location...',
       colors: [
         '#E91E63',
         '#9C27B0',
@@ -58,9 +88,11 @@ export default class IrinaMaps extends Component {
       bounds: null,
       center: { lat: 33.690, lng: -117.887 },
       markers: [],
+      userLocationMarker: [],
       usedColors: [],
       resultLimit: 10,
-      results: []
+      results: [],
+      placeholder: ''
     }
   }
 
@@ -70,6 +102,7 @@ export default class IrinaMaps extends Component {
   handlePlacesChanged = this.handlePlacesChanged.bind(this);
   handleMarkerClick = this.handleMarkerClick.bind(this);
   handleResultLimitChange = this.handleResultLimitChange.bind(this);
+  setUserLocationMarker = this.setUserLocationMarker.bind(this);
   getIconColor = this.getIconColor.bind(this);
 
   getIconColor() {
@@ -89,17 +122,56 @@ export default class IrinaMaps extends Component {
       this.setState({
         resultLimit: e.target.value
       });
+    } else {
+      //TODO: add error message
     }
+  }
+
+  setUserLocationMarker(position) {
+    const userLocationMarker = [
+      {
+        position: {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        },
+        defaultAnimation: 2,
+        zIndex: google.maps.Marker.MAX_ZINDEX + 1,
+        key: Date.now(), // Add a key property for: http://fb.me/react-warning-keys
+      },
+    ];
+
+    let bounds = this._map.getBounds();
+    userLocationMarker.map(function(marker) {
+      return bounds.extend(marker.position);
+    });
+    this._map.fitBounds(bounds);
+    this.setState({
+      bounds: bounds,
+      center: {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      },
+      userLocationMarker: userLocationMarker
+    });
   }
 
   handleMapMounted(map) {
     this._map = map;
+    // Try HTML5 geolocation.
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(this.setUserLocationMarker, function() {
+        //setLocationSearchbox();
+      });
+    } else {
+      // Browser doesn't support Geolocation
+      //setLocationSearchbox();
+    }
   }
 
   handleBoundsChanged() {
     this.setState({
       bounds: this._map.getBounds(),
-      center: this._map.getCenter(),
+      center: this._map.getCenter()
     });
   }
 
@@ -143,38 +215,44 @@ export default class IrinaMaps extends Component {
     const mapCenter = nextMarkers.length > 0 ? nextMarkers[0].position : this.state.center;
     this.setState({
       center: mapCenter,
-      markers: nextMarkers,
+      markers: nextMarkers
     });
   }
 
   render() {
+    let placeholder = this.state.userLocationMarker ? 'Search...' : 'Set location...';
     return (
-      <div style={{height: `100%`}}>
-        <Layout>
-          <SearchBox placeholder={this.state.placeholder} />
-          <Drawer>
-            <Sidebar results={this.state.results} resultLimit={this.state.resultLimit} handleResultLimitChange={this.handleResultLimitChange} />
-          </Drawer>
-          <Content>
-            <GoogleMapComponent
-              containerElement={
-                <div style={{ height: `100%` }} />
-              }
-              mapElement={
-                <div style={{ height: `100%` }} />
-              }
-              center={this.state.center}
-              onMapLoad={this.handleMapMounted}
-              onBoundsChanged={this.handleBoundsChanged}
-              onSearchBoxMounted={this.handleSearchBoxMounted}
-              bounds={this.state.bounds}
-              onPlacesChanged={this.handlePlacesChanged}
-              markers={this.state.markers}
-              onMarkerClick={this.handleMarkerClick}
-            />
-          </Content>
-        </Layout>
-      </div>
+      <Layout>
+        <Drawer>
+          <Sidebar
+            results={this.state.results}
+            resultLimit={this.state.resultLimit}
+            handleResultLimitChange={this.handleResultLimitChange}
+          />
+        </Drawer>
+        <Content>
+          <GoogleMapComponent
+            containerElement={
+              <div style={{ height: `100%` }} />
+            }
+            mapElement={
+              <div style={{ height: `100%` }} />
+            }
+            center={this.state.center}
+            onMapLoad={this.handleMapMounted}
+            onBoundsChanged={this.handleBoundsChanged}
+            markers={this.state.markers}
+            userLocationMarker={this.state.userLocationMarker}
+            onMarkerClick={this.handleMarkerClick}
+            onSearchBoxMounted={this.handleSearchBoxMounted}
+            onPlacesChanged={this.handlePlacesChanged}
+            bounds={this.state.bounds}
+            placeholder={placeholder}
+          />
+        </Content>
+      </Layout>
     );
   }
 }
+
+export default Irinamaps;

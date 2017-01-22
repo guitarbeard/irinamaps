@@ -1,20 +1,27 @@
 {
   "name": "irinamaps",
+  "homepage": "https://www.irinamaps.com/",
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "react-scripts": "0.8.5"
+    "gh-pages": "^0.12.0",
+    "react-scripts": "0.8.5",
+    "history": "^2.1.2",
+    "raw-loader": "^0.5.1"
   },
   "dependencies": {
+    "lodash": "^4.17.4",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-google-maps": "^6.0.1",
-    "react-mdl": "^1.9.0"
+    "react-mdl": "^1.9.0",
+    "react-router": "^3.0.2"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "npm run build&&gh-pages -d build"
   }
 }

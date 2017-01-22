@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { Textfield } from 'react-mdl';
 import Result from './Result';
-import './Sidebar.css';
 
-export default class Sidebar extends Component {
+class Sidebar extends Component {
   render() {
     return (
       <div>
@@ -26,3 +25,5 @@ export default class Sidebar extends Component {
     );
   }
 }
+
+export default Sidebar;
