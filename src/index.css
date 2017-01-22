@@ -9,6 +9,34 @@ html, body {
   width: 100%;
 }
 
+.search-box {
+  position: fixed!important;
+  background-color: rgb(255, 255, 255);
+  font-family: Roboto;
+  font-size: 15px;
+  font-weight: 300;
+  padding: 20px 25px 20px 50px;
+  text-overflow: ellipsis;
+  width: 216px;
+  margin-left: 12px;
+  z-index: 6!important;
+  box-shadow: rgba(0, 0, 0, 0.298039) 0px 2px 6px;
+  border-radius: 2px 0px 0px 2px;
+  outline: none;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  height: 32px;
+  margin-top: 10px;
+}
+
+.search-box:focus {
+  border-color: #4d90fe;
+}
+
+.hidden {
+  display: none;
+}
+
 #target {
   width: 345px;
 }
@@ -21,7 +49,6 @@ html, body {
   width: 28px!important;
   min-width: 28px!important;
   color: #666666;
-  display: none;
   position: absolute;
   z-index: 1;
   right: 0;
@@ -62,11 +89,6 @@ html, body {
   margin-bottom: 0;
   max-height: calc(100% - 131px);
   overflow-y: hidden;
-  display: none;
-}
-
-body[location-set="true"] #take-me-home, body[location-set="true"] #edit-home, body[location-set="true"] #results-wrap{
-  display: block;
 }
 
 .result{
@@ -152,7 +174,6 @@ body[location-set="true"] #take-me-home, body[location-set="true"] #edit-home, b
 }
 
 #result-limit-num-wrap {
-  display: none;
   margin-top: 60px;
   padding: 0 20px;
 }
@@ -161,10 +182,6 @@ body[location-set="true"] #take-me-home, body[location-set="true"] #edit-home, b
   background: #bbbbbb;
   width: 100%;
   text-align: center;
-}
-
-body[location-set='true'] #result-limit-num-wrap{
-  display: block;
 }
 
 #result-limit-num-wrap input {

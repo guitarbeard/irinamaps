@@ -18,7 +18,7 @@ class Sidebar extends Component {
         </div>
         <ul id="results-wrap" className='mdl-list'>
         {this.props.results.map((result, index) => (
-          <Result key={index} onClick={() => this.props.onMarkerClick(result)} />
+          <Result name={result.name} color={result.color} key={index} onClick={() => this.props.onMarkerClick(result)} />
         ))}
         </ul>
       </div>

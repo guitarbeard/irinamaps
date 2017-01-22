@@ -6,9 +6,17 @@ class Result extends Component {
       backgroundColor: this.props.color
     };
     return (
-      <div className="result" style={resultStyle}>
-        <div className="result-text">Meow!</div>
-      </div>
+      <li className="result mdl-list__item mdl-list__item--two-line" style={resultStyle}>
+        <button className="result-text mdl-list__item-primary-content mdl-button mdl-js-button">
+          {this.props.name}
+          <div className="result-amount">10 results</div>
+        </button>
+        <span className="mdl-list__item-secondary-content">
+          <button className="mdl-button mdl-js-button mdl-button--icon remove-result">
+            <i className="material-icons">clear</i>
+          </button>
+        </span>
+      </li>
     );
   }
 }
