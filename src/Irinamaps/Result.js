@@ -9,7 +9,7 @@ export default class Result extends Component {
       let resultPlural = this.props.result.markers.length > 1 ? 's' : '';
       return (
         <li className="result mdl-list__item mdl-list__item--two-line" style={resultStyle}>
-          <button onClick={() => this.props.onResultClick(this.props.result)} className="result-text mdl-list__item-primary-content mdl-button mdl-js-button">
+          <button onClick={() => this.props.onResultClick([this.props.result])} className="result-text mdl-list__item-primary-content mdl-button mdl-js-button">
             <div className="text-wrap">{this.props.result.name}</div>
             <div className="result-amount">{this.props.result.markers.length} result{resultPlural}</div>
           </button>

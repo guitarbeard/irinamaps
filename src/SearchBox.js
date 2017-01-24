@@ -1,3 +1,4 @@
+// taken from react-google-maps/src/lib/places/SearchBox.js folder of react-google-maps because the lib/places/SearchBox.js gives errors
 /* global google */
 import _ from "lodash";
 

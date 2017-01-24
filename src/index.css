@@ -29,6 +29,16 @@ html, body {
   margin-top: 10px;
 }
 
+.mdl-snackbar__text {
+  width: 100%;
+  text-align: center;
+}
+
+.mdl-snackbar__text .material-icons {
+  margin-left: 15px;
+  vertical-align: bottom;
+}
+
 .search-box:focus {
   border-color: #4d90fe;
 }
@@ -82,7 +92,7 @@ html, body {
 
 #results-wrap{
   padding: 0;
-  margin-bottom: 0;
+  margin: 0;
   max-height: calc(100% - 131px);
   overflow-y: hidden;
 }
@@ -134,6 +144,7 @@ html, body {
   width: 100%;
   background-repeat: no-repeat;
   background-size: cover;
+  background-position: center;
 }
 
 .attribution{
