@@ -10,6 +10,7 @@
     "raw-loader": "^0.5.1"
   },
   "dependencies": {
+    "invariant": "^2.2.2",
     "lodash": "^4.17.4",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",

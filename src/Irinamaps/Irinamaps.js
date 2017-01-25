@@ -1,19 +1,15 @@
 /* global google, navigator */
 import _ from 'lodash';
-
 import  React, { Component } from 'react';
-
-import { withGoogleMap, GoogleMap, Marker, InfoWindow } from 'react-google-maps';
-
+import { withGoogleMap, Marker, InfoWindow } from 'react-google-maps';
+import GoogleMap from '../GoogleMap';
 import SearchBox from '../SearchBox';
-
-import { Layout, Drawer, Content, Snackbar } from 'react-mdl';
-
+import { Layout, Drawer, Content, Snackbar, Spinner } from 'react-mdl';
 import Sidebar from './Sidebar';
-
 import EditButtons from './EditButtons';
-
 import InfoWindowContent from './InfoWindowContent';
+import NewLocationDialog from './NewLocationDialog';
+import RedoSearchRadio from './RedoSearchRadio'
 
 const COLORS = [
   '#E91E63',
@@ -45,10 +41,12 @@ const GoogleMapComponent = withGoogleMap(props => (
     mapTypeId={google.maps.MapTypeId.ROADMAP}
     zoom={props.zoom}
     bounds={props.bounds}
+    onClick={props.onMapClick}
     options={{
       mapTypeControl:false,
       disableDefaultUI:true,
-      zoomControl:true
+      zoomControl:true,
+      clickableIcons: false
     }}
   >
     <SearchBox
@@ -59,7 +57,13 @@ const GoogleMapComponent = withGoogleMap(props => (
       inputClassName="search-box"
     />
     {props.userLocationMarker.map(marker => (
-      <Marker zIndex={marker.zIndex} position={marker.position} key={marker.key} onClick={() => props.onMarkerClick(marker, true)} />
+      <Marker zIndex={marker.zIndex} position={marker.position} key={marker.key} onClick={() => props.onMarkerClick(marker, true)}>
+        {marker.showInfo && (
+          <InfoWindow onCloseClick={() => props.onMarkerClose(marker)}>
+            <NewLocationDialog showRedoSearch={props.results.length > 0} redoSearch={props.redoSearch} handleRedoSearch={props.handleRedoSearch} onMarkerKeep={() => props.onNewLocationKeep(marker)} onMarkerDelete={() => props.onMarkerClose(marker)} />
+          </InfoWindow>
+        )}
+      </Marker>
     ))}
     {props.results.map(result => result.markers.map((marker, index) => (
       <Marker icon={marker.icon} position={marker.position} key={index} onClick={() => props.onMarkerClick(marker)}>
@@ -87,7 +91,9 @@ export default class Irinamaps extends Component {
       results: [],
       zoom: 15,
       isSnackbarActive: false,
-      snackbarText: ''
+      snackbarText: '',
+      redoSearch: 'false',
+      isLoading: true
     }
   }
 
@@ -104,30 +110,153 @@ export default class Irinamaps extends Component {
   zoomToUserLocation = this.zoomToUserLocation.bind(this);
   editUserLocationMarker = this.editUserLocationMarker.bind(this);
   setUserLocationMarker = this.setUserLocationMarker.bind(this);
+  setTempUserLocationMarker = this.setTempUserLocationMarker.bind(this);
   handleMarkerClose = this.handleMarkerClose.bind(this);
   setBounds = this.setBounds.bind(this);
   handleShowSnackbar = this.handleShowSnackbar.bind(this);
   handleTimeoutSnackbar = this.handleTimeoutSnackbar.bind(this);
+  handleMapClick = this.handleMapClick.bind(this);
+  handleNewLocationKeep = this.handleNewLocationKeep.bind(this);
+  redoSearchesInNewLocation = this.redoSearchesInNewLocation.bind(this);
+  handleRedoSearch = this.handleRedoSearch.bind(this);
+
+  handleRedoSearch(redoSearch) {
+    this.setState({
+      redoSearch: redoSearch.target.value
+    });
+  }
+
+  handleNewLocationKeep(marker) {
+    this.redoSearchesInNewLocation(marker, () => {
+      this.setUserLocationMarker({geometry:{location: marker.position}});
+    });
+  }
+
+  redoSearchesInNewLocation(marker, callback) {
+    this.setState({
+      isLoading: true
+    });
+
+    if(this.state.redoSearch === 'true' && this.state.results.length > 0) {
+      let placesService = new google.maps.places.PlacesService(this._map.getMap());
+      let that = this, results = [], usedColors = [], stateResults = this.state.results, stateResultLimit = this.state.resultLimit;
+      let redoResultSearch = function redoResultSearch(index) {
+        let result = stateResults[index];
+        let center;
+        if(marker.hasOwnProperty('geometry')) {
+          // came from a search result
+          center = marker.geometry.location;
+        } else {
+          // geolocation result
+          center = marker.position;
+        }
+        let request = {
+          location: center,
+          radius: '30',
+          query: result.name
+        };
+
+        placesService.textSearch(request, function resolveTextSearch(places, status) {
+          if (status === google.maps.places.PlacesServiceStatus.OK) {
+            let limit = Number(stateResultLimit);
+
+            const filteredPlaces = places.filter((value, index) => {
+              return index < limit;
+            });
+
+            let iconColor = COLORS.filter(color => {
+              if(usedColors.length === 0) {
+                return color;
+              } else {
+                if(usedColors.indexOf(color) === -1) {
+                  return color;
+                } else {
+                  return false;
+                }
+              }
+            });
+
+            iconColor = iconColor[0];
+
+            // Add a marker for each place returned from search bar
+            let coloredIcon = Object.assign({}, MARKER_ICON);
+            coloredIcon.fillColor = iconColor;
+
+            const markers = filteredPlaces.map(place => ({
+              position: place.geometry.location,
+              icon: coloredIcon,
+              showInfo: false,
+              place
+            }));
+
+            const newResult = {
+              name: result.name,
+              color: iconColor,
+              markers: markers
+            };
+
+            results.push(newResult);
+            usedColors.push(iconColor);
+          }
+          // check if last result, else run again
+          if(index === stateResults.length - 1){
+            that.setState({
+              results,
+              usedColors,
+              isLoading: false
+            }, callback);
+          }else{
+            redoResultSearch(index + 1);
+          }
+        });
+      }
+      redoResultSearch(0);
+    } else {
+      this.setState({
+        isLoading: false
+      }, callback);
+    }
+  }
+
+  handleMapClick(event) {
+    if(!event.placeId) {
+      if(this.state.userLocationMarker.length === 0) {
+        // just set it, if no location
+        this.redoSearchesInNewLocation({ position: event.latLng, key: Date.now() }, () => {
+          this.setUserLocationMarker({geometry:{location: event.latLng}});
+        });
+      } else {
+        this.setTempUserLocationMarker(event.latLng);
+      }
+    }
+  }
+
+  setTempUserLocationMarker(position) {
+    const tempUserLocationMarker = { position: position, key: Date.now(), showInfo: true, isTemp: true };
+    this.setState(prevState => ({
+      userLocationMarker: [prevState.userLocationMarker[0], tempUserLocationMarker],
+      center: position
+    }));
+  }
 
   setBounds(targetResults) {
-    if(!targetResults) {
-      targetResults = this.state.results;
-    }
-
-    let bounds = new google.maps.LatLngBounds();
-
-    this.state.userLocationMarker.map(marker => bounds.extend(marker.position));
-
-    targetResults.map(result => result.markers.map(marker => bounds.extend(marker.position)));
-
-    this._map.fitBounds(bounds);
-
-    if(!this.state.results.length) {
+    if(this.state.results.length === 0) {
       // set zoom to a reasonable amount if no search results and center on user
       this.setState({
         zoom: 15,
         center: this.state.userLocationMarker[0].position
       });
+    } else {
+      if(!targetResults) {
+        targetResults = this.state.results;
+      }
+
+      let bounds = new google.maps.LatLngBounds();
+
+      this.state.userLocationMarker.map(marker => bounds.extend(marker.position));
+
+      targetResults.map(result => result.markers.map(marker => bounds.extend(marker.position)));
+      this._map.fitBounds(bounds);
     }
   }
 
@@ -146,9 +275,7 @@ export default class Irinamaps extends Component {
     this.setState(prevState => ({
       results: nextResults,
       usedColors: prevState.usedColors.filter(color => color !== removedColor)
-    }));
-
-    this.setBounds();
+    }), this.setBounds);
   }
 
   handleResultLimitChange(e) {
@@ -171,7 +298,7 @@ export default class Irinamaps extends Component {
   }
 
   zoomToUserLocation() {
-    if (this.state.userLocationMarker.length) {
+    if (this.state.userLocationMarker.length > 0) {
       this.setState({
         zoom: 15,
         center: this.state.userLocationMarker[0].position
@@ -180,6 +307,10 @@ export default class Irinamaps extends Component {
   }
 
   editUserLocationMarker(error) {
+    this.setState({
+      isLoading: false
+    });
+
     this._searchBox._inputElement.focus();
     if(error) {
       this.setState({
@@ -201,6 +332,9 @@ export default class Irinamaps extends Component {
   }
 
   setUserLocationMarker(position) {
+    this.setState({
+      isLoading: false
+    });
     let center;
     if(position.hasOwnProperty('geometry')) {
       // came from a search result
@@ -215,17 +349,15 @@ export default class Irinamaps extends Component {
 
     const userLocationMarker = [{ position: center, key: Date.now() }];
 
-    let searchBounds = new google.maps.Circle({center: center, radius: 30}).getBounds()
+    let searchBounds = new google.maps.Circle({center: center, radius: 30}).getBounds();
 
     this.setState({
       searchBounds,
       userLocationMarker
-    });
+    }, this.setBounds);
 
     this._searchBox._inputElement.setAttribute('placeholder', 'Search...');
     this._searchBox._inputElement.value = '';
-
-    this.setBounds();
   }
 
   handleMapMounted(map) {
@@ -274,8 +406,10 @@ export default class Irinamaps extends Component {
     }
 
     // means that we are using the search to set the user location
-    if(!this.state.userLocationMarker.length) {
-      this.setUserLocationMarker(places[0]);
+    if(!this.state.userLocationMarker.length > 0) {
+      this.redoSearchesInNewLocation(places[0], () => {
+        this.setUserLocationMarker(places[0]);
+      });
       return false;
     }
 
@@ -380,7 +514,13 @@ export default class Irinamaps extends Component {
 
   handleMarkerClick(targetMarker, isUserLocationMarker) {
     if (isUserLocationMarker) {
-      this.zoomToUserLocation();
+      if(targetMarker.isTemp) {
+        this.setState(prevState => ({
+          center: targetMarker.position
+        }));
+      } else {
+        this.zoomToUserLocation();
+      }
     } else {
       this.setState({
         results: this.state.results.map(result => {
@@ -392,7 +532,10 @@ export default class Irinamaps extends Component {
                   showInfo: true,
                 };
               }
-              return marker;
+              return {
+                ...marker,
+                showInfo: false,
+              };
             });
           }
           return result;
@@ -402,6 +545,12 @@ export default class Irinamaps extends Component {
   }
 
   handleMarkerClose(targetMarker) {
+    if(targetMarker.isTemp) {
+      this.setState(prevState => ({
+        userLocationMarker: [prevState.userLocationMarker[0]]
+      }));
+      return false;
+    }
     this.setState({
       results: this.state.results.map(result => {
         if (result.color === targetMarker.icon.fillColor) {
@@ -429,50 +578,66 @@ export default class Irinamaps extends Component {
   }
 
   render() {
-    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText } = this.state;
+    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText, redoSearch } = this.state;
+    let showRedoSearch = userLocationMarker.length < 1 && results.length > 0;
+    let loadingClassName = this.state.isLoading ? 'active' : '';
     return (
-      <Layout>
-        <Drawer>
-          <Sidebar
-            results={results}
-            resultLimit={resultLimit}
-            onResultLimitChange={this.handleResultLimitChange}
-            onResultClick={this.setBounds}
-            onResultDelete={this.handleResultDelete}
-          />
-        </Drawer>
-        <Content>
-          <GoogleMapComponent
-            containerElement={
-              <div style={{ height: `100%` }} />
+      <div>
+        <div id="loading-overlay" className={loadingClassName}>
+          <Spinner />
+        </div>
+        <Layout>
+          <Drawer>
+            <Sidebar
+              results={results}
+              resultLimit={resultLimit}
+              onResultLimitChange={this.handleResultLimitChange}
+              onResultClick={this.setBounds}
+              onResultDelete={this.handleResultDelete}
+            />
+          </Drawer>
+          <Content>
+            {showRedoSearch &&
+              <div className="redo-search">
+                <RedoSearchRadio onChange={this.handleRedoSearch} value={redoSearch}/>
+              </div>
             }
-            mapElement={
-              <div style={{ height: `100%` }} />
-            }
-            results={results}
-            zoom={zoom}
-            center={center}
-            onMapLoad={this.handleMapMounted}
-            onBoundsChanged={this.handleBoundsChanged}
-            onZoomChanged={this.handleZoomChanged}
-            userLocationMarker={userLocationMarker}
-            onMarkerDelete={this.handleMarkerDelete}
-            onMarkerKeep={this.handleMarkerKeep}
-            onMarkerClick={this.handleMarkerClick}
-            onSearchBoxMounted={this.handleSearchBoxMounted}
-            onPlacesChanged={this.handlePlacesChanged}
-            bounds={bounds}
-            searchBounds={searchBounds}
-            onMarkerClose={this.handleMarkerClose}
-          />
-          <EditButtons onHomeClick={this.zoomToUserLocation} onEditLocationClick={this.editUserLocationMarker} />
-        </Content>
-        <Snackbar
-          active={isSnackbarActive}
-          onTimeout={this.handleTimeoutSnackbar}>
-          {snackbarText}
-        </Snackbar>
-      </Layout>
+            <GoogleMapComponent
+              containerElement={
+                <div style={{ height: `100%` }} />
+              }
+              mapElement={
+                <div style={{ height: `100%` }} />
+              }
+              results={results}
+              zoom={zoom}
+              center={center}
+              onMapLoad={this.handleMapMounted}
+              onBoundsChanged={this.handleBoundsChanged}
+              onZoomChanged={this.handleZoomChanged}
+              userLocationMarker={userLocationMarker}
+              onMarkerDelete={this.handleMarkerDelete}
+              onMarkerKeep={this.handleMarkerKeep}
+              onMarkerClick={this.handleMarkerClick}
+              onSearchBoxMounted={this.handleSearchBoxMounted}
+              onPlacesChanged={this.handlePlacesChanged}
+              bounds={bounds}
+              searchBounds={searchBounds}
+              onMarkerClose={this.handleMarkerClose}
+              onMapClick={this.handleMapClick}
+              onNewLocationKeep={this.handleNewLocationKeep}
+              redoSearch={redoSearch}
+              handleRedoSearch={this.handleRedoSearch}
+            />
+            <EditButtons onHomeClick={this.zoomToUserLocation} onEditLocationClick={this.editUserLocationMarker} />
+          </Content>
+          <Snackbar
+            active={isSnackbarActive}
+            onTimeout={this.handleTimeoutSnackbar}>
+            {snackbarText}
+          </Snackbar>
+        </Layout>
+      </div>
     );
   }
 }

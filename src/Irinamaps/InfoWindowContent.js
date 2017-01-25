@@ -28,7 +28,12 @@ export default class InfoWindowContent extends Component {
       }
     }
 
-    url = 'https://maps.google.com/?q='+this.props.place.name+' '+this.props.place.formatted_address;
+    if(!this.props.place.url) {
+      url = 'https://maps.google.com/?q='+this.props.place.name+' '+this.props.place.formatted_address;
+    } else {
+      url = this.props.place.url;
+    }
+
 
     return (
       <div className="info-window">
