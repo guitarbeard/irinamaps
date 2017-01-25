@@ -46,7 +46,8 @@ const GoogleMapComponent = withGoogleMap(props => (
       mapTypeControl:false,
       disableDefaultUI:true,
       zoomControl:true,
-      clickableIcons: false
+      clickableIcons: false,
+      gestureHandling: 'greedy'
     }}
   >
     <SearchBox

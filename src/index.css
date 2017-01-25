@@ -44,7 +44,7 @@ html, body {
   border-radius: 2px;
 }
 
-.redo-search .mdl-radio__label {
+.redo-search .mdl-radio__label, .info-window .mdl-radio__label {
   font-size: 11px;
 }
 
@@ -52,7 +52,7 @@ html, body {
   position: fixed!important;
   background-color: rgb(255, 255, 255);
   font-family: Roboto;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 300;
   padding: 20px 25px 20px 50px;
   text-overflow: ellipsis;
@@ -183,7 +183,7 @@ html, body {
 .info-window{
   clear: both;
   padding: 20px 0 10px 20px;
-  max-width: 220px;
+  max-width: 192px;
 }
 
 .place-img{
@@ -214,7 +214,11 @@ html, body {
 
 .btn-group-justified button {
   display: inline-block;
-  width: 103px;
+  width: 84px;
+}
+
+.info-window .btn-keep {
+  width: 103px!important;
 }
 
 .btn-group-justified button:first-child {
@@ -237,7 +241,7 @@ address {
 
 .btn-directions {
   margin-top: 5px;
-  width: 179px;
+  width: 160px;
 }
 
 .website{
@@ -272,6 +276,7 @@ address {
 #result-limit-num-wrap input {
   color: white;
   border-bottom-color: white;
+  font-size: 16px;
 }
 
 #result-limit-num-wrap label {
