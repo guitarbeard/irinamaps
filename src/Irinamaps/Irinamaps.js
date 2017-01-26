@@ -391,7 +391,7 @@ export default class Irinamaps extends Component {
     this._searchBox._inputElement.setAttribute('placeholder', 'Set location...');
 
     // move outside of google maps in order to see it over the sidebar
-    setTimeout(() => document.getElementById('root').appendChild(ReactDOM.findDOMNode(this._searchBox._inputElement)), 400);
+    setTimeout(() => document.getElementById('root').appendChild(ReactDOM.findDOMNode(this._searchBox._inputElement)), 500);
   }
 
   handlePlacesChanged() {
