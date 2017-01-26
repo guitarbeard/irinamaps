@@ -1,6 +1,7 @@
 /* global google, navigator */
 import _ from 'lodash';
 import  React, { Component } from 'react';
+import ReactDOM from "react-dom";
 import { withGoogleMap, Marker, InfoWindow } from 'react-google-maps';
 import GoogleMap from '../GoogleMap';
 import SearchBox from '../SearchBox';
@@ -19,8 +20,8 @@ const COLORS = [
   '#009688',
   '#8BC34A',
   '#FFC107',
-  '#795548',
-  '#FF5722'
+  '#FF5722',
+  '#795548'
 ];
 
 const MARKER_ICON = {
@@ -388,6 +389,9 @@ export default class Irinamaps extends Component {
   handleSearchBoxMounted(searchBox) {
     this._searchBox = searchBox;
     this._searchBox._inputElement.setAttribute('placeholder', 'Set location...');
+
+    // move outside of google maps in order to see it over the sidebar
+    setTimeout(() => document.getElementById('root').appendChild(ReactDOM.findDOMNode(this._searchBox._inputElement)), 400);
   }
 
   handlePlacesChanged() {
