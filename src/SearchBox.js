@@ -18,7 +18,7 @@ import {
   default as enhanceElement,
 } from "react-google-maps/lib/enhanceElement";
 
-import * as helpers from "react-google-maps/lib/utils/SearchBoxHelper";
+import * as helpers from "./SearchBoxHelper";
 
 const controlledPropTypes = {
   // NOTICE!!!!!!
