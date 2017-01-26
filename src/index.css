@@ -134,6 +134,7 @@ html, body {
   margin: 0;
   max-height: calc(100% - 131px);
   overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 .keep-text {
