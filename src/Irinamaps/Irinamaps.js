@@ -591,6 +591,11 @@ export default class Irinamaps extends Component {
         <div id="loading-overlay" className={loadingClassName}>
           <Spinner />
         </div>
+        {showRedoSearch &&
+          <div className="redo-search">
+            <RedoSearchRadio onChange={this.handleRedoSearch} value={redoSearch}/>
+          </div>
+        }
         <Layout>
           <Drawer>
             <Sidebar
@@ -602,11 +607,6 @@ export default class Irinamaps extends Component {
             />
           </Drawer>
           <Content>
-            {showRedoSearch &&
-              <div className="redo-search">
-                <RedoSearchRadio onChange={this.handleRedoSearch} value={redoSearch}/>
-              </div>
-            }
             <GoogleMapComponent
               containerElement={
                 <div style={{ height: `100%` }} />
