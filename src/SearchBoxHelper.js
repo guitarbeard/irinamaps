@@ -26,7 +26,7 @@ export function createInputElement(props) {
 }
 
 export function mountInputElementToControlPositionOnMap(inputEl, controlPosition, map) {
-  return document.getElementById('loading-overlay').parentNode.insertBefore(inputEl, document.getElementById('loading-overlay').nextSibling);
+  return document.getElementsByClassName('mdl-layout__drawer-button')[0].parentNode.insertBefore(inputEl, document.getElementsByClassName('mdl-layout__drawer-button')[0].nextSibling);
 }
 
 export function unmountInputElementFromControlPositionOnMap(index, controlPosition, map) {
