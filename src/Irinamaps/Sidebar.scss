@@ -1,0 +1,55 @@
+#result-limit-num-wrap {
+  margin-top: 60px;
+  padding: 0 20px;
+  opacity: 0;
+  input {
+    color: white;
+    border-bottom-color: white;
+    font-size: 16px;
+  }
+  label {
+    color: white;
+    &:after {
+      bottom: 18px;
+      background-color: white;
+    }
+  }
+}
+
+.mdl-textfield__error {
+  background: #bbbbbb;
+  width: 100%;
+  text-align: center;
+}
+
+#results-wrap {
+  padding: 0;
+  margin: 0;
+  max-height: calc(100% - 131px);
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+.mdl-layout__drawer {
+  border-right: none;
+  left: 40px;
+  box-shadow: none;
+  background-color: rgba(0, 0, 0, 0);
+  transition-property: transform;
+  transition-property: transform,-webkit-transform,background-color,left,box-shadow;
+  &.is-visible {
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
+    #results-wrap {
+      overflow-y: auto;
+    }
+    #result-limit-num-wrap {
+      opacity: 1;
+    }
+  }
+}
+
+.mdl-radio__label {
+  font-size: 13px;
+}

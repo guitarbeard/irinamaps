@@ -20,6 +20,8 @@ import {
 
 import * as helpers from "./SearchBoxHelper";
 
+import "./SearchBox.scss";
+
 const controlledPropTypes = {
   // NOTICE!!!!!!
   //

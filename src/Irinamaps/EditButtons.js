@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './EditButtons.scss';
 
 export default class EditButtons extends Component {
   render() {

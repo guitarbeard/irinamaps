@@ -1,0 +1,33 @@
+ .btn-group-justified {
+  margin-top: 5px;
+  button {
+    display: inline-block;
+    width: 84px;
+    padding: 0;
+    &:first-child {
+      margin-right: 5px;
+    }
+  }
+}
+
+.btn-cancel {
+  background-color: #d9534f;
+  color: white;
+}
+
+.btn-ok {
+  background-color: #5cb85c;
+  color: white;
+}
+
+.btn-directions {
+  margin-top: 5px;
+  width: 192px;
+  padding: 0;
+}
+
+.info-window {
+  .btn-ok {
+    width: 103px!important;
+  }
+}

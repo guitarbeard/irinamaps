@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { RadioGroup, Radio } from 'react-mdl';
+import './RedoSearchRadio.scss';
 
 export default class RedoSearchRadio extends Component {
   render() {

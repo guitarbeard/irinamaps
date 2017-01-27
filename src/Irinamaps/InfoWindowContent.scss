@@ -1,0 +1,29 @@
+.info-window {
+  clear: both;
+  padding: 20px 0 10px 20px;
+  max-width: 195px;
+  .mdl-radio__label {
+    font-size: 11px;
+  }
+  .place-img {
+    height: 100px;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+  }
+  .attribution {
+    font-size: 8px;
+  }
+  .openNow {
+    color: #5cb85c;
+    margin-top: 5px;
+  }
+  .closedNow {
+    color: #d9534f;
+    margin-top: 5px;
+  }
+  address {
+    line-height: 1.3;
+  }
+}

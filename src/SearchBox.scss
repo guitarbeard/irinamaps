@@ -1,0 +1,22 @@
+.search-box {
+  position: fixed!important;
+  background-color: rgb(255, 255, 255);
+  font-family: Roboto;
+  font-size: 16px;
+  font-weight: 300;
+  padding: 0 25px 0 50px;
+  text-overflow: ellipsis;
+  width: 216px;
+  margin-left: 12px;
+  z-index: 6!important;
+  box-shadow: rgba(0, 0, 0, 0.298039) 0px 2px 6px;
+  border-radius: 2px;
+  outline: none;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  height: 42px;
+  margin-top: 10px;
+  &:focus {
+    border-color: #4d90fe;
+  }
+}
