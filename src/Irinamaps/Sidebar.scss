@@ -16,6 +16,14 @@
   }
 }
 
+#color-blind-mode-wrap {
+  padding: 0 20px 20px;
+  opacity: 0;
+  label {
+    color: white;
+  }
+}
+
 .mdl-textfield__error {
   background: #bbbbbb;
   width: 100%;
@@ -44,7 +52,7 @@
     #results-wrap {
       overflow-y: auto;
     }
-    #result-limit-num-wrap {
+    #result-limit-num-wrap, #color-blind-mode-wrap {
       opacity: 1;
     }
   }
