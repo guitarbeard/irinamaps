@@ -25,7 +25,7 @@ const COLORS = [
 
 const createMarkerIcon = function createMarkerIcon(text, fillColor) {
   let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><path d="M19.39,1.562c-2.505-1.238-5.94-0.477-8.377,1.643C8.576,1.085,5.141,0.323,2.636,1.562 C-0.357,3.039-0.88,6.782,1.474,9.924l1.962,2.065l0.402,0.425l7.174,7.56l7.174-7.56l0.402-0.425l1.963-2.065 C22.906,6.782,22.383,3.039,19.39,1.562z" fill-opacity="1" stroke-opacity="0.5" stroke="#ffffff" fill="'+fillColor+'"></path><text x="8" y="14" font-family="Helvetica" font-size="11" stroke="none" fill="white">'+text+'</text></svg>';
-  return 'data:image/svg+xml,' + svg;
+  return svg;
 }
 
 const GoogleMapComponent = withGoogleMap(props => (
@@ -65,7 +65,7 @@ const GoogleMapComponent = withGoogleMap(props => (
     ))}
     {props.results.map((result, resultIndex) => result.markers.map((marker, index) => {
       let markerNum = props.colorBlindMode ? resultIndex + 1 : '';
-      let icon = createMarkerIcon(markerNum, marker.iconColor);
+      let icon = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(createMarkerIcon(markerNum, marker.iconColor));
       return (
         <Marker icon={icon} position={marker.position} key={index} onClick={() => props.onMarkerClick(marker)}>
           {marker.showInfo && (
@@ -219,6 +219,18 @@ export default class Irinamaps extends Component {
   }
 
   handleMapClick(event) {
+    // close all info windows
+    this.setState({
+      results: this.state.results.map(result => {
+        result.markers = result.markers.map(marker => {
+          return {
+            ...marker,
+            showInfo: false,
+          };
+        });
+        return result;
+      })
+    });
     if(!event.placeId) {
       if(this.state.userLocationMarker.length === 0) {
         // just set it, if no location
@@ -472,7 +484,7 @@ export default class Irinamaps extends Component {
   handleMarkerDelete(targetMarker) {
     let removedColor = false;
     const nextResults = this.state.results.filter(result => {
-      if (result.color === targetMarker.icon.fillColor) {
+      if (result.color === targetMarker.iconColor) {
         result.markers = result.markers.filter(marker => marker !== targetMarker);
         if (result.markers.length) {
           return result;
@@ -496,7 +508,7 @@ export default class Irinamaps extends Component {
 
   handleMarkerKeep(targetMarker) {
     const nextResults = this.state.results.map(result => {
-      if (result.color === targetMarker.icon.fillColor) {
+      if (result.color === targetMarker.iconColor) {
         result.markers = result.markers.filter(marker => marker === targetMarker);
       }
       return result;
@@ -519,25 +531,24 @@ export default class Irinamaps extends Component {
         this.zoomToUserLocation();
       }
     } else {
-      this.setState({
-        results: this.state.results.map(result => {
-          if (result.color === targetMarker.icon.fillColor) {
-            result.markers = result.markers.map(marker => {
-              if (marker === targetMarker) {
-                return {
-                  ...marker,
-                  showInfo: true,
-                };
-              }
+      this.setState(prevState => ({
+        userLocationMarker: [prevState.userLocationMarker[0]],
+        results: prevState.results.map(result => {
+          result.markers = result.markers.map(marker => {
+            if (marker === targetMarker) {
               return {
                 ...marker,
-                showInfo: false,
+                showInfo: true,
               };
-            });
-          }
+            }
+            return {
+              ...marker,
+              showInfo: false,
+            };
+          });
           return result;
         })
-      });
+      }));
     }
   }
 
@@ -550,7 +561,7 @@ export default class Irinamaps extends Component {
     }
     this.setState({
       results: this.state.results.map(result => {
-        if (result.color === targetMarker.icon.fillColor) {
+        if (result.color === targetMarker.iconColor) {
           result.markers = result.markers.map(marker => {
             if (marker === targetMarker) {
               return {
