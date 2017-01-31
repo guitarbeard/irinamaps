@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Textfield } from 'react-mdl';
+import { Textfield, Checkbox } from 'react-mdl';
 import Result from './Result';
 import './Sidebar.scss';
 
@@ -17,9 +17,12 @@ export default class Sidebar extends Component {
             value={this.props.resultLimit}
           />
         </div>
+        <div id="color-blind-mode-wrap">
+          <Checkbox label="Color Blind Mode" ripple checked={this.props.colorBlindMode} onChange={this.props.onColorBlindModeChange} />
+        </div>
         <ul id="results-wrap" className='mdl-list'>
         {this.props.results.map((result, index) => (
-          <Result result={result} key={index} onResultClick={this.props.onResultClick} onResultDelete={this.props.onResultDelete} />
+          <Result resultNum={index + 1} colorBlindMode={this.props.colorBlindMode} result={result} key={index} onResultClick={this.props.onResultClick} onResultDelete={this.props.onResultDelete} />
         ))}
         </ul>
       </div>
