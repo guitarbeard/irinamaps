@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import './Result.scss';
 
 export default class Result extends Component {
-
   render() {
     if (this.props.result.markers && this.props.result.markers.length) {
       let resultStyle = {

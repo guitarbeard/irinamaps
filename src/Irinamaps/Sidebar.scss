@@ -18,10 +18,19 @@
   }
 }
 
+#route-btn-wrap {
+  padding: 0 20px 20px;
+  opacity: 0;
+  .mdl-button {
+    width: 100%;
+    background-color: rgb(53, 84, 255);
+  }
+}
+
 #color-blind-mode-wrap {
   display: inline-block;
-  width: 155px;
   opacity: 0;
+  width: 155px;
   .mdl-checkbox {
     color: white;
     .mdl-checkbox__box-outline {
@@ -49,8 +58,6 @@
 #results-wrap {
   padding: 0;
   margin: 0;
-  max-height: calc(100% - 131px);
-  overflow-y: hidden;
   overflow-x: hidden;
 }
 
@@ -68,7 +75,7 @@
     #results-wrap {
       overflow-y: auto;
     }
-    #result-limit-num-wrap, #color-blind-mode-wrap {
+    #result-limit-num-wrap, #color-blind-mode-wrap, #route-btn-wrap {
       opacity: 1;
     }
   }

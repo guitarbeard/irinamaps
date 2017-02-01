@@ -4,7 +4,7 @@ html, body {
   padding: 0;
 }
 
-#root, #map, .mdl-layout__content, #loading-overlay {
+#root, #map, .mdl-layout__content, .overlay {
   height: 100%;
   width: 100%;
 }
@@ -13,9 +13,12 @@ html, body {
   display: none;
 }
 
-#loading-overlay {
+.overlay {
   background: rgba(0, 0, 0, 0.8);
   position: absolute;
+}
+
+#loading-overlay {
   z-index: 10;
   display: none;
   &.active {

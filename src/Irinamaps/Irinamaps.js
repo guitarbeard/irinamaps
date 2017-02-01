@@ -10,6 +10,7 @@ import EditButtons from './EditButtons';
 import InfoWindowContent from './InfoWindowContent';
 import NewLocationDialog from './NewLocationDialog';
 import RedoSearchRadio from './RedoSearchRadio'
+import RouteDialog from './RouteDialog'
 
 const COLORS = [
   '#E91E63',
@@ -70,7 +71,7 @@ const GoogleMapComponent = withGoogleMap(props => (
         <Marker icon={icon} position={marker.position} key={index} onClick={() => props.onMarkerClick(marker)}>
           {marker.showInfo && (
             <InfoWindow onCloseClick={() => props.onMarkerClose(marker)}>
-              <InfoWindowContent onMarkerKeep={() => props.onMarkerKeep(marker)} onMarkerDelete={() => props.onMarkerDelete(marker)} place={marker.place} />
+              <InfoWindowContent onAddWaypoint={() => props.onAddWaypoint(marker)} onMarkerKeep={() => props.onMarkerKeep(marker)} onMarkerDelete={() => props.onMarkerDelete(marker)} place={marker.place} />
             </InfoWindow>
           )}
         </Marker>
@@ -96,7 +97,9 @@ export default class Irinamaps extends Component {
       snackbarText: '',
       redoSearch: 0,
       isLoading: true,
-      colorBlindMode: false
+      colorBlindMode: false,
+      openDialog: false,
+      waypoints: []
     }
   }
 
@@ -123,6 +126,9 @@ export default class Irinamaps extends Component {
   redoSearchesInNewLocation = this.redoSearchesInNewLocation.bind(this);
   handleRedoSearch = this.handleRedoSearch.bind(this);
   handleColorBlindMode = this.handleColorBlindMode.bind(this);
+  handleOpenDialog = this.handleOpenDialog.bind(this);
+  handleCloseDialog = this.handleCloseDialog.bind(this);
+  handleAddWaypoint = this.handleAddWaypoint.bind(this);
 
   handleRedoSearch(redoSearch) {
     this.setState({
@@ -590,8 +596,22 @@ export default class Irinamaps extends Component {
     this.setState({ isSnackbarActive: false });
   }
 
+  handleOpenDialog() {
+    this.setState({ openDialog: true });
+  }
+
+  handleCloseDialog() {
+    this.setState({ openDialog: false });
+  }
+
+  handleAddWaypoint(targetMarker) {
+    this.setState(prevState => ({
+      waypoints: _.flatten([prevState.waypoints, targetMarker])
+    }));
+  }
+
   render() {
-    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText, redoSearch, colorBlindMode, usedColors, isLoading } = this.state;
+    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText, redoSearch, colorBlindMode, usedColors, isLoading, openDialog, waypoints } = this.state;
     let showRedoSearch = userLocationMarker.length < 1 && results.length > 0;
     let loadingClassName = isLoading ? 'active' : '';
     let maxSearchesClassName = usedColors.length === COLORS.length ? 'max-searches' : '';
@@ -615,6 +635,7 @@ export default class Irinamaps extends Component {
               onResultDelete={this.handleResultDelete}
               onColorBlindModeChange={this.handleColorBlindMode}
               colorBlindMode={colorBlindMode}
+              onRouteBtnClick={this.handleOpenDialog}
             />
           </Drawer>
           <Content>
@@ -645,6 +666,7 @@ export default class Irinamaps extends Component {
               redoSearch={redoSearch}
               handleRedoSearch={this.handleRedoSearch}
               colorBlindMode={colorBlindMode}
+              onAddWaypoint={this.handleAddWaypoint}
             />
             <EditButtons onHomeClick={this.zoomToUserLocation} onEditLocationClick={this.editUserLocationMarker} />
           </Content>
@@ -654,6 +676,7 @@ export default class Irinamaps extends Component {
             {snackbarText}
           </Snackbar>
         </Layout>
+        <RouteDialog open={openDialog} onClose={this.handleCloseDialog} waypoints={waypoints} />
       </div>
     );
   }

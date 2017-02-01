@@ -10,8 +10,8 @@ export default class NewLocationDialog extends Component {
           <RedoSearchRadio onChange={this.props.handleRedoSearch} value={this.props.redoSearch}/>
         }
         <div className="btn-group-justified">
-          <button onClick={this.props.onMarkerDelete} type="button" className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect btn-cancel btn">cancel</button>
-          <button onClick={this.props.onMarkerKeep} type="button" className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect btn-ok btn">ok</button>
+          <button onClick={this.props.onMarkerDelete} type="button" className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--raised mdl-button--accent btn-cancel btn">cancel</button>
+          <button onClick={this.props.onMarkerKeep} type="button" className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--raised mdl-button--accent btn-ok btn">ok</button>
         </div>
       </div>
     );

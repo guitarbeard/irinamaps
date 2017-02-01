@@ -45,8 +45,9 @@ export default class InfoWindowContent extends Component {
           {openNow}
         </address>
         <div className="btn-group-justified">
-          <button onClick={this.props.onMarkerDelete} type="button" className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect btn-cancel btn">remove</button>
-          <button onClick={this.props.onMarkerKeep} type="button" className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect btn-ok btn">keep only</button>
+          <button onClick={this.props.onMarkerDelete} type="button" className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--raised mdl-button--accent btn-cancel btn">remove</button>
+          <button onClick={this.props.onMarkerKeep} type="button" className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--raised mdl-button--accent btn-ok btn">keep only</button>
+          <button onClick={this.props.onAddWaypoint} type="button" className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--raised mdl-button--accent btn-add-to-route">Add to Route</button>
           <a className="btn-block mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect btn-directions" href={url} target="_blank">
             Get Directions
           </a>
