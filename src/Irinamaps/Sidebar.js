@@ -7,18 +7,20 @@ export default class Sidebar extends Component {
   render() {
     return (
       <div>
-        <div id="result-limit-num-wrap">
-          <Textfield
-            onChange={this.props.onResultLimitChange}
-            pattern="-?[0-9]*(\.[0-9]+)?"
-            error="Input is not a number!"
-            label="Max Results"
-            floatingLabel
-            value={this.props.resultLimit}
-          />
-        </div>
-        <div id="color-blind-mode-wrap">
-          <Checkbox label="Color Blind Mode" ripple checked={this.props.colorBlindMode} onChange={this.props.onColorBlindModeChange} />
+        <div>
+          <div id="result-limit-num-wrap">
+            <Textfield
+              onChange={this.props.onResultLimitChange}
+              pattern="-?[0-9]*(\.[0-9]+)?"
+              error="Input is not a number!"
+              label="Max"
+              floatingLabel
+              value={this.props.resultLimit}
+            />
+          </div>
+          <div id="color-blind-mode-wrap">
+            <Checkbox label="Color Blind Mode" ripple checked={this.props.colorBlindMode} onChange={this.props.onColorBlindModeChange} />
+          </div>
         </div>
         <ul id="results-wrap" className='mdl-list'>
         {this.props.results.map((result, index) => (
