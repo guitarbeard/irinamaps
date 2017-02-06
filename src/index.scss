@@ -71,7 +71,6 @@ html, body {
   border: 1px solid transparent;
   border-radius: 2px 0 0 2px;
   box-sizing: border-box;
-  -moz-box-sizing: border-box;
   height: 32px;
   outline: none;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -82,12 +81,21 @@ html, body {
 }
 
 .mdl-layout__drawer-button {
-  margin: 4px;
+  margin: 11px 0 0 13px;
+  line-height: 49px;
+  height: 40px;
+  width: 48px;
+  border-radius: 2px;
   color: rgba(0,0,0,.5);
   z-index: 9;
-  padding-top: 3px;
-  padding-left: 8px;
   outline: none;
+  background: white;
+}
+
+.max-searches {
+  .mdl-layout__drawer-button {
+    box-shadow: rgba(0, 0, 0, 0.298039) 0px 2px 6px;
+  }
 }
 
 .mdl-layout__obfuscator.is-visible {

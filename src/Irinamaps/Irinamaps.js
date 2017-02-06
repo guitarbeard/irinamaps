@@ -425,19 +425,6 @@ export default class Irinamaps extends Component {
       return false;
     }
 
-    if (this.state.usedColors.length === COLORS.length) {
-      this.setState({
-        isSnackbarActive: true,
-        snackbarText: (
-          <div>
-            Max Searches Reached!
-            <i className="material-icons">warning</i>
-          </div>
-        )
-      });
-      return false;
-    }
-
     let limit = Number(this.state.resultLimit);
 
     const filteredPlaces = places.filter((value, index) => {
@@ -472,12 +459,26 @@ export default class Irinamaps extends Component {
       markers: markers
     };
 
+    // the last search color is about to be used
+    if (this.state.usedColors.length === COLORS.length - 1) {
+      this.setState({
+        isSnackbarActive: true,
+        snackbarText: (
+          <div>
+            Max Searches Reached!
+            <i className="material-icons">warning</i>
+          </div>
+        )
+      });
+    }
+
     this.setState(prevState => ({
       results: _.flattenDeep([prevState.results, result]),
       usedColors: _.flatten([prevState.usedColors, iconColor])
     }));
 
     this._searchBox._inputElement.value = '';
+    this._searchBox._inputElement.blur();
     this.setBounds();
   }
 
@@ -590,11 +591,12 @@ export default class Irinamaps extends Component {
   }
 
   render() {
-    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText, redoSearch, colorBlindMode } = this.state;
+    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText, redoSearch, colorBlindMode, usedColors, isLoading } = this.state;
     let showRedoSearch = userLocationMarker.length < 1 && results.length > 0;
-    let loadingClassName = this.state.isLoading ? 'active' : '';
+    let loadingClassName = isLoading ? 'active' : '';
+    let maxSearchesClassName = usedColors.length === COLORS.length ? 'max-searches' : '';
     return (
-      <div>
+      <div className={maxSearchesClassName}>
         <div id="loading-overlay" className={loadingClassName}>
           <Spinner />
         </div>
