@@ -1,4 +1,4 @@
-/* global google, navigator */
+/* global google, navigator, document */
 import _ from 'lodash';
 import  React, { Component } from 'react';
 import { withGoogleMap, Marker, InfoWindow } from 'react-google-maps';
@@ -98,6 +98,13 @@ export default class Irinamaps extends Component {
       isLoading: true,
       colorBlindMode: false
     }
+  }
+
+  componentDidMount() {
+    // focus when closing sidebar
+    document.getElementsByClassName('mdl-layout__obfuscator')[0].addEventListener('click', () => {
+      this._searchBox._inputElement.focus()
+    }, false);
   }
 
   handleMapMounted = this.handleMapMounted.bind(this);
