@@ -4,6 +4,7 @@
   opacity: 0;
   width: 40px;
   display: inline-block;
+  vertical-align: middle;
   input {
     color: white;
     border-bottom-color: white;
@@ -19,6 +20,8 @@
 }
 
 #color-blind-mode-wrap {
+  margin-top: 60px;
+  vertical-align: middle;
   display: inline-block;
   width: 155px;
   opacity: 0;
