@@ -19,6 +19,8 @@ import {
   default as enhanceElement,
 } from "react-google-maps/lib/enhanceElement";
 
+import createReactClass from 'create-react-class';
+
 const controlledPropTypes = {
   // NOTICE!!!!!!
   //
@@ -155,7 +157,7 @@ function getInstanceFromComponent(component) {
 }
 
 export default _.flowRight(
-  React.createClass,
+  createReactClass,
   enhanceElement(getInstanceFromComponent, publicMethodMap, eventMap, controlledPropUpdaterMap),
 )({
   displayName: `GoogleMap`,

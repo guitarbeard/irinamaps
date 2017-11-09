@@ -3,7 +3,6 @@
 import _ from "lodash";
 
 import {
-  default as React,
   PropTypes,
 } from "react";
 
@@ -21,6 +20,8 @@ import {
 import * as helpers from "./SearchBoxHelper";
 
 import "./SearchBox.scss";
+
+import createReactClass from 'create-react-class';
 
 const controlledPropTypes = {
   // NOTICE!!!!!!
@@ -67,7 +68,7 @@ function getInstanceFromComponent(component) {
 }
 
 export default _.flowRight(
-  React.createClass,
+  createReactClass,
   enhanceElement(getInstanceFromComponent, publicMethodMap, eventMap, controlledPropUpdaterMap),
 )({
   displayName: `SearchBox`,
