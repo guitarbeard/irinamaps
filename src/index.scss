@@ -4,9 +4,102 @@ html, body {
   padding: 0;
 }
 
-#root, #map, .mdl-layout__content, #loading-overlay {
+// generic transform
+@mixin transform($transforms) {
+	   -moz-transform: $transforms;
+	     -o-transform: $transforms;
+	    -ms-transform: $transforms;
+	-webkit-transform: $transforms;
+          transform: $transforms;
+}
+// rotate
+@mixin rotate ($deg) {
+  @include transform(rotate(#{$deg}deg));
+}
+
+// scale
+@mixin scale($scale) {
+	 @include transform(scale($scale));
+}
+// translate
+@mixin translate ($x, $y) {
+   @include transform(translate($x, $y));
+}
+// skew
+@mixin skew ($x, $y) {
+   @include transform(skew(#{$x}deg, #{$y}deg));
+}
+//transform origin
+@mixin transform-origin ($origin) {
+    moz-transform-origin: $origin;
+	     -o-transform-origin: $origin;
+	    -ms-transform-origin: $origin;
+	-webkit-transform-origin: $origin;
+          transform-origin: $origin;
+}
+
+#root, #map, .mdl-layout__content, #loading-overlay, .ReactModalPortal {
   height: 100%;
   width: 100%;
+}
+
+.ReactModalPortal {
+  position: fixed;
+  z-index: 10;
+  .overlay {
+    background: rgba(0, 0, 0, 0.8);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  h1 {
+    font-size: 27px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  p {
+    font-size: 18px;
+  }
+  .modal-content {
+    outline: none;
+    padding: 15px;
+    width: calc(100% - 60px);
+    height: auto;
+    max-width: 488px;
+    top: 50%;
+    left: 50%;
+    @include translate(-50%, -50%);
+    background: white;
+    position: absolute;
+  }
+}
+
+#welcome-toggle-wrap {
+  display: inline-block;
+  margin-right: 15px;
+  vertical-align: middle;
+  .mdl-checkbox {
+    .mdl-checkbox__box-outline {
+      border-color: #20D1E5;
+    }
+    &.is-checked {
+      .mdl-checkbox__tick-outline {
+        background-color: #20D1E5;
+      }
+    }
+    .mdl-checkbox__ripple-container {
+      .mdl-ripple {
+        background: #20D1E5;
+      }
+    }
+  }
+}
+
+.text-right {
+  text-align: right;
 }
 
 .hidden {
@@ -39,7 +132,7 @@ html, body {
   }
 }
 
-#edit-home, #take-me-home {
+.edit-button {
   width: 28px!important;
   min-width: 28px!important;
   color: #666666;
@@ -48,16 +141,23 @@ html, body {
   right: 0;
   margin-right: 10px;
   background-color: #FAFAFA;
-  border-radius: 2px 2px 0 0;
   height: 28px!important;
+  &:hover {
+    background-color: #FAFAFA;
+  }
+}
+
+#more-info {
+  border-radius: 2px 2px 0 0;
+  bottom: 156px;
 }
 
 #edit-home {
+  border-radius: 0;
   border-bottom: #E6E6E6 solid thin;
   bottom: 128px;
   .material-icons {
-    -webkit-transform: translate(-12px,-12px);
-    transform: translate(-12px,-12px);
+    @include translate(-12px, -12px);
   }
 }
 

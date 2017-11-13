@@ -4,7 +4,8 @@ import  React, { Component } from 'react';
 import { withGoogleMap, Marker, InfoWindow } from 'react-google-maps';
 import GoogleMap from '../GoogleMap';
 import SearchBox from '../SearchBox';
-import { Layout, Drawer, Content, Snackbar, Spinner } from 'react-mdl';
+import { Layout, Drawer, Content, Snackbar, Spinner, Checkbox } from 'react-mdl';
+import ReactModal from 'react-modal';
 import Sidebar from './Sidebar';
 import EditButtons from './EditButtons';
 import InfoWindowContent from './InfoWindowContent';
@@ -22,6 +23,30 @@ const COLORS = [
   '#FF5722',
   '#795548'
 ];
+
+const storageAvailable = function storageAvailable(type) {
+  try {
+    var storage = window[type],
+        x = '__storage_test__';
+    storage.setItem(x, x);
+    storage.removeItem(x);
+    return true;
+  }
+  catch(e) {
+    return e instanceof DOMException && (
+      // everything except Firefox
+      e.code === 22 ||
+      // Firefox
+      e.code === 1014 ||
+      // test name field too, because code might not be present
+      // everything except Firefox
+      e.name === 'QuotaExceededError' ||
+      // Firefox
+      e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+      // acknowledge QuotaExceededError only if there's something already stored
+      storage.length !== 0;
+  }
+}
 
 const createMarkerIcon = function createMarkerIcon(text, fillColor) {
   let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><path d="M19.39,1.562c-2.505-1.238-5.94-0.477-8.377,1.643C8.576,1.085,5.141,0.323,2.636,1.562 C-0.357,3.039-0.88,6.782,1.474,9.924l1.962,2.065l0.402,0.425l7.174,7.56l7.174-7.56l0.402-0.425l1.963-2.065 C22.906,6.782,22.383,3.039,19.39,1.562z" fill-opacity="1" stroke-opacity="0.5" stroke="#ffffff" fill="'+fillColor+'"></path><text x="8" y="14" font-family="Helvetica" font-size="11" stroke="none" fill="white">'+text+'</text></svg>';
@@ -83,6 +108,10 @@ export default class Irinamaps extends Component {
 
   constructor(props) {
     super(props);
+    let cachedHideWelcome = false;
+    if (storageAvailable('localStorage')) {
+      cachedHideWelcome = localStorage.getItem('hideWelcome') === 'true' ? true : false;
+    }
     this.state = {
       bounds: null,
       searchBounds: null,
@@ -96,7 +125,9 @@ export default class Irinamaps extends Component {
       snackbarText: '',
       redoSearch: 0,
       isLoading: true,
-      colorBlindMode: false
+      colorBlindMode: false,
+      openModal: cachedHideWelcome ? false : true,
+      hideWelcome: cachedHideWelcome
     }
   }
 
@@ -123,13 +154,15 @@ export default class Irinamaps extends Component {
   setTempUserLocationMarker = this.setTempUserLocationMarker.bind(this);
   handleMarkerClose = this.handleMarkerClose.bind(this);
   setBounds = this.setBounds.bind(this);
-  handleShowSnackbar = this.handleShowSnackbar.bind(this);
   handleTimeoutSnackbar = this.handleTimeoutSnackbar.bind(this);
   handleMapClick = this.handleMapClick.bind(this);
   handleNewLocationKeep = this.handleNewLocationKeep.bind(this);
   redoSearchesInNewLocation = this.redoSearchesInNewLocation.bind(this);
   handleRedoSearch = this.handleRedoSearch.bind(this);
   handleColorBlindMode = this.handleColorBlindMode.bind(this);
+  handleOpenModal = this.handleOpenModal.bind(this);
+  handleCloseModal = this.handleCloseModal.bind(this);
+  handleHideWelcome = this.handleHideWelcome.bind(this);
 
   handleRedoSearch(redoSearch) {
     this.setState({
@@ -216,7 +249,7 @@ export default class Irinamaps extends Component {
             redoResultSearch(index + 1);
           }
         });
-      }
+      };
       redoResultSearch(0);
     } else {
       this.setState({
@@ -585,10 +618,6 @@ export default class Irinamaps extends Component {
     });
   }
 
-  handleShowSnackbar() {
-    this.setState({ isSnackbarActive: true });
-  }
-
   handleColorBlindMode(event) {
     this.setState({ colorBlindMode: event.target.checked });
   }
@@ -597,8 +626,23 @@ export default class Irinamaps extends Component {
     this.setState({ isSnackbarActive: false });
   }
 
+  handleOpenModal() {
+    this.setState({ openModal: true });
+  }
+
+  handleCloseModal() {
+    this.setState({ openModal: false });
+  }
+
+  handleHideWelcome(event) {
+    if (storageAvailable('localStorage')) {
+      localStorage.setItem('hideWelcome', event.target.checked);
+    }
+    this.setState({ hideWelcome: event.target.checked });
+  }
+
   render() {
-    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText, redoSearch, colorBlindMode, usedColors, isLoading } = this.state;
+    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText, redoSearch, colorBlindMode, usedColors, isLoading, openModal, hideWelcome } = this.state;
     let showRedoSearch = userLocationMarker.length < 1 && results.length > 0;
     let loadingClassName = isLoading ? 'active' : '';
     let maxSearchesClassName = usedColors.length === COLORS.length ? 'max-searches' : '';
@@ -653,13 +697,35 @@ export default class Irinamaps extends Component {
               handleRedoSearch={this.handleRedoSearch}
               colorBlindMode={colorBlindMode}
             />
-            <EditButtons onHomeClick={this.zoomToUserLocation} onEditLocationClick={this.editUserLocationMarker} />
+            <EditButtons
+            onHomeClick={this.zoomToUserLocation}
+            onEditLocationClick={this.editUserLocationMarker}
+            onMoreInfoClick={this.handleOpenModal}
+            />
           </Content>
           <Snackbar
             active={isSnackbarActive}
             onTimeout={this.handleTimeoutSnackbar}>
             {snackbarText}
           </Snackbar>
+          <ReactModal
+            isOpen={openModal}
+            closeTimeoutMS={0}
+            overlayClassName="overlay"
+            className="modal-content"
+            contentLabel="Welcome to Irinamaps!"
+            shouldCloseOnOverlayClick={true}
+            role="dialog"
+            parentSelector={() => document.body}>
+            <h1>Welcome to Irinamaps<img src="/favicon-32x32.png" width="32" height="32" alt="Irinamaps"/></h1>
+            <p>The first tool that displays multiple search results in one map!</p>
+            <div className="text-right">
+              <div id="welcome-toggle-wrap">
+                <Checkbox label="Don't Show Again" checked={hideWelcome} onChange={this.handleHideWelcome} />
+              </div>
+              <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect btn" onClick={this.handleCloseModal}>GOT IT!</button>
+            </div>
+          </ReactModal>
         </Layout>
       </div>
     );
