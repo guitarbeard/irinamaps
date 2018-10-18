@@ -68,7 +68,7 @@ const GoogleMapComponent = withGoogleMap(props => (
       disableDefaultUI:true,
       zoomControl:true,
       clickableIcons: false,
-      gestureHandling: 'cooperative'
+      gestureHandling: 'greedy'
     }}
   >
     {props.initLocation ?
