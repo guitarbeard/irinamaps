@@ -53,6 +53,13 @@ const publicMethodMap = {
   //
   // [].map.call($0.querySelectorAll("tr>td>code"), function(it){ return it.textContent; })
   //    .filter(function(it){ return it.match(/^get/) && !it.match(/Map$/); })
+  setBounds(searchBox, bounds) {
+    if(Array.isArray(bounds)) {
+      bounds = bounds[0];
+    }
+    return searchBox.setBounds(bounds);
+   },
+
   getBounds(searchBox) { return searchBox.getBounds(); },
 
   getPlaces(searchBox) { return searchBox.getPlaces(); },
@@ -60,7 +67,9 @@ const publicMethodMap = {
 };
 
 const controlledPropUpdaterMap = {
-  bounds(searchBox, bounds) { searchBox.setBounds(bounds); },
+  bounds(searchBox, bounds) {
+    searchBox.setBounds(bounds);
+  },
 };
 
 function getInstanceFromComponent(component) {

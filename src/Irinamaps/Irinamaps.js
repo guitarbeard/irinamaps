@@ -58,7 +58,6 @@ const GoogleMapComponent = withGoogleMap(props => (
     ref={props.onMapLoad}
     defaultZoom={15}
     center={props.center}
-    onBoundsChanged={props.onBoundsChanged}
     onZoomChanged={props.onZoomChanged}
     mapTypeId={google.maps.MapTypeId.ROADMAP}
     zoom={props.zoom}
@@ -69,16 +68,17 @@ const GoogleMapComponent = withGoogleMap(props => (
       disableDefaultUI:true,
       zoomControl:true,
       clickableIcons: false,
-      gestureHandling: 'greedy'
+      gestureHandling: 'cooperative'
     }}
   >
+    {props.initLocation ?
     <SearchBox
       ref={props.onSearchBoxMounted}
       bounds={props.searchBounds}
       controlPosition={google.maps.ControlPosition.TOP_LEFT}
       onPlacesChanged={props.onPlacesChanged}
       inputClassName="search-box"
-    />
+    /> : null}
     {props.userLocationMarker.map(marker => (
       <Marker zIndex={marker.zIndex} position={marker.position} key={marker.key} onClick={() => props.onMarkerClick(marker, true)}>
         {marker.showInfo && (
@@ -113,8 +113,8 @@ export default class Irinamaps extends Component {
       cachedHideWelcome = localStorage.getItem('hideWelcome') === 'true' ? true : false;
     }
     this.state = {
-      bounds: null,
-      searchBounds: null,
+      bounds: new google.maps.Circle({center: { lat: 33.690, lng: -117.887 }, radius: 30}).getBounds(),
+      searchBounds: new google.maps.Circle({center: { lat: 33.690, lng: -117.887 }, radius: 30}).getBounds(),
       center: { lat: 33.690, lng: -117.887 },
       userLocationMarker: [],
       usedColors: [],
@@ -125,6 +125,7 @@ export default class Irinamaps extends Component {
       snackbarText: '',
       redoSearch: 0,
       isLoading: true,
+      initLocation: false,
       colorBlindMode: false,
       openModal: cachedHideWelcome ? false : true,
       hideWelcome: cachedHideWelcome
@@ -138,45 +139,19 @@ export default class Irinamaps extends Component {
     }, false);
   }
 
-  handleMapMounted = this.handleMapMounted.bind(this);
-  handleBoundsChanged = this.handleBoundsChanged.bind(this);
-  handleZoomChanged = this.handleZoomChanged.bind(this);
-  handleSearchBoxMounted = this.handleSearchBoxMounted.bind(this);
-  handlePlacesChanged = this.handlePlacesChanged.bind(this);
-  handleMarkerDelete = this.handleMarkerDelete.bind(this);
-  handleResultDelete = this.handleResultDelete.bind(this);
-  handleMarkerKeep = this.handleMarkerKeep.bind(this);
-  handleMarkerClick = this.handleMarkerClick.bind(this);
-  handleResultLimitChange = this.handleResultLimitChange.bind(this);
-  zoomToUserLocation = this.zoomToUserLocation.bind(this);
-  editUserLocationMarker = this.editUserLocationMarker.bind(this);
-  setUserLocationMarker = this.setUserLocationMarker.bind(this);
-  setTempUserLocationMarker = this.setTempUserLocationMarker.bind(this);
-  handleMarkerClose = this.handleMarkerClose.bind(this);
-  setBounds = this.setBounds.bind(this);
-  handleTimeoutSnackbar = this.handleTimeoutSnackbar.bind(this);
-  handleMapClick = this.handleMapClick.bind(this);
-  handleNewLocationKeep = this.handleNewLocationKeep.bind(this);
-  redoSearchesInNewLocation = this.redoSearchesInNewLocation.bind(this);
-  handleRedoSearch = this.handleRedoSearch.bind(this);
-  handleColorBlindMode = this.handleColorBlindMode.bind(this);
-  handleOpenModal = this.handleOpenModal.bind(this);
-  handleCloseModal = this.handleCloseModal.bind(this);
-  handleHideWelcome = this.handleHideWelcome.bind(this);
-
-  handleRedoSearch(redoSearch) {
+  handleRedoSearch = (redoSearch) => {
     this.setState({
       redoSearch: Number(redoSearch.target.value)
     });
   }
 
-  handleNewLocationKeep(marker) {
+  handleNewLocationKeep = (marker) => {
     this.redoSearchesInNewLocation(marker, () => {
       this.setUserLocationMarker({geometry:{location: marker.position}});
     });
   }
 
-  redoSearchesInNewLocation(marker, callback) {
+  redoSearchesInNewLocation = (marker, callback) => {
     this.setState({
       isLoading: true
     });
@@ -258,7 +233,7 @@ export default class Irinamaps extends Component {
     }
   }
 
-  handleMapClick(event) {
+  handleMapClick = (event) => {
     // close all info windows
     this.setState({
       results: this.state.results.map(result => {
@@ -283,7 +258,7 @@ export default class Irinamaps extends Component {
     }
   }
 
-  setTempUserLocationMarker(position) {
+  setTempUserLocationMarker = (position) => {
     const tempUserLocationMarker = { position: position, key: Date.now(), showInfo: true, isTemp: true };
     this.setState(prevState => ({
       userLocationMarker: [prevState.userLocationMarker[0], tempUserLocationMarker],
@@ -291,7 +266,7 @@ export default class Irinamaps extends Component {
     }));
   }
 
-  setBounds(targetResults) {
+  setBounds = (targetResults) => {
     if(this.state.results.length === 0) {
       // set zoom to a reasonable amount if no search results and center on user
       this.setState({
@@ -307,12 +282,14 @@ export default class Irinamaps extends Component {
 
       this.state.userLocationMarker.map(marker => bounds.extend(marker.position));
 
-      targetResults.map(result => result.markers.map(marker => bounds.extend(marker.position)));
+      if(targetResults) {
+        targetResults.map(result => result.markers.map(marker => bounds.extend(marker.position)));
+      }
       this._map.fitBounds(bounds);
     }
   }
 
-  handleResultDelete(targetResult) {
+  handleResultDelete = (targetResult) => {
     let removedColor = false;
     const nextResults = this.state.results.filter(result => {
       if (result === targetResult) {
@@ -330,7 +307,7 @@ export default class Irinamaps extends Component {
     }), this.setBounds);
   }
 
-  handleResultLimitChange(e) {
+  handleResultLimitChange = (e) => {
     if (e.target.value <= 20) {
       this.setState({
         resultLimit: e.target.value
@@ -349,7 +326,7 @@ export default class Irinamaps extends Component {
     }
   }
 
-  zoomToUserLocation() {
+  zoomToUserLocation = () => {
     if (this.state.userLocationMarker.length > 0) {
       this.setState({
         zoom: 15,
@@ -358,9 +335,11 @@ export default class Irinamaps extends Component {
     }
   }
 
-  editUserLocationMarker(error) {
+  editUserLocationMarker = (error) => {
     this.setState({
-      isLoading: false
+      isLoading: false,
+      initLocation: true,
+      userLocationMarker: []
     });
 
     this._searchBox._inputElement.focus();
@@ -375,18 +354,11 @@ export default class Irinamaps extends Component {
         )
       });
     }
-
-    this.setState({
-      userLocationMarker: []
-    });
     // the SearchBox inputPlaceholder prop doesn't seem to update so I'll do it manually :(
     this._searchBox._inputElement.setAttribute('placeholder', 'Set location...');
   }
 
-  setUserLocationMarker(position) {
-    this.setState({
-      isLoading: false
-    });
+  setUserLocationMarker = (position) => {
     let center;
     if(position.hasOwnProperty('geometry')) {
       // came from a search result
@@ -405,14 +377,16 @@ export default class Irinamaps extends Component {
 
     this.setState({
       searchBounds,
-      userLocationMarker
+      userLocationMarker,
+      isLoading: false,
+      initLocation: true,
     }, this.setBounds);
 
     this._searchBox._inputElement.setAttribute('placeholder', 'Search...');
     this._searchBox._inputElement.value = '';
   }
 
-  handleMapMounted(map) {
+  handleMapMounted = (map) => {
     this._map = map;
     // Try HTML5 geolocation.
     if (navigator.geolocation) {
@@ -423,27 +397,26 @@ export default class Irinamaps extends Component {
     }
   }
 
-  handleBoundsChanged() {
-    this.setState({
-      bounds: this._map.getBounds(),
-      center: this._map.getCenter()
-    });
-  }
+  // handleBoundsChanged = () => {
+  //   this.setState({
+  //     bounds: this._map.getBounds(),
+  //     center: this._map.getCenter()
+  //   });
+  // }
 
-  handleZoomChanged() {
+  handleZoomChanged = () => {
     this.setState({
       zoom: this._map.getZoom()
     });
   }
 
-  handleSearchBoxMounted(searchBox) {
+  handleSearchBoxMounted = (searchBox) => {
     this._searchBox = searchBox;
     this._searchBox._inputElement.setAttribute('placeholder', 'Set location...');
   }
 
-  handlePlacesChanged() {
+  handlePlacesChanged = () => {
     const places = this._searchBox.getPlaces();
-
     if (!places.length) {
       this.setState({
         isSnackbarActive: true,
@@ -522,7 +495,7 @@ export default class Irinamaps extends Component {
     this.setBounds();
   }
 
-  handleMarkerDelete(targetMarker) {
+  handleMarkerDelete = (targetMarker) => {
     let removedColor = false;
     const nextResults = this.state.results.filter(result => {
       if (result.color === targetMarker.iconColor) {
@@ -547,7 +520,7 @@ export default class Irinamaps extends Component {
     this.setBounds();
   }
 
-  handleMarkerKeep(targetMarker) {
+  handleMarkerKeep = (targetMarker) => {
     const nextResults = this.state.results.map(result => {
       if (result.color === targetMarker.iconColor) {
         result.markers = result.markers.filter(marker => marker === targetMarker);
@@ -562,7 +535,7 @@ export default class Irinamaps extends Component {
     this.setBounds();
   }
 
-  handleMarkerClick(targetMarker, isUserLocationMarker) {
+  handleMarkerClick = (targetMarker, isUserLocationMarker) => {
     if (isUserLocationMarker) {
       if(targetMarker.isTemp) {
         this.setState(prevState => ({
@@ -593,7 +566,7 @@ export default class Irinamaps extends Component {
     }
   }
 
-  handleMarkerClose(targetMarker) {
+  handleMarkerClose = (targetMarker) => {
     if(targetMarker.isTemp) {
       this.setState(prevState => ({
         userLocationMarker: [prevState.userLocationMarker[0]]
@@ -618,23 +591,23 @@ export default class Irinamaps extends Component {
     });
   }
 
-  handleColorBlindMode(event) {
+  handleColorBlindMode = (event) => {
     this.setState({ colorBlindMode: event.target.checked });
   }
 
-  handleTimeoutSnackbar() {
+  handleTimeoutSnackbar = () => {
     this.setState({ isSnackbarActive: false });
   }
 
-  handleOpenModal() {
+  handleOpenModal = () => {
     this.setState({ openModal: true });
   }
 
-  handleCloseModal() {
+  handleCloseModal = () => {
     this.setState({ openModal: false });
   }
 
-  handleHideWelcome(event) {
+  handleHideWelcome = (event) => {
     if (storageAvailable('localStorage')) {
       localStorage.setItem('hideWelcome', event.target.checked);
     }
@@ -642,7 +615,7 @@ export default class Irinamaps extends Component {
   }
 
   render() {
-    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText, redoSearch, colorBlindMode, usedColors, isLoading, openModal, hideWelcome } = this.state;
+    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText, redoSearch, colorBlindMode, usedColors, isLoading, initLocation, openModal, hideWelcome } = this.state;
     let showRedoSearch = userLocationMarker.length < 1 && results.length > 0;
     let loadingClassName = isLoading ? 'active' : '';
     let maxSearchesClassName = usedColors.length === COLORS.length ? 'max-searches' : '';
@@ -680,12 +653,12 @@ export default class Irinamaps extends Component {
               zoom={zoom}
               center={center}
               onMapLoad={this.handleMapMounted}
-              onBoundsChanged={this.handleBoundsChanged}
               onZoomChanged={this.handleZoomChanged}
               userLocationMarker={userLocationMarker}
               onMarkerDelete={this.handleMarkerDelete}
               onMarkerKeep={this.handleMarkerKeep}
               onMarkerClick={this.handleMarkerClick}
+              initLocation={initLocation}
               onSearchBoxMounted={this.handleSearchBoxMounted}
               onPlacesChanged={this.handlePlacesChanged}
               bounds={bounds}
