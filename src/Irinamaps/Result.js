@@ -10,7 +10,7 @@ export default class Result extends Component {
       };
       let resultPlural = this.props.result.markers.length > 1 ? 's' : '';
       let name = this.props.colorBlindMode ? this.props.resultNum + ' - ' + this.props.result.name : this.props.result.name;
-      let resultLetter = this.props.colorBlindMode ? this.props.resultNum : this.props.result.name[0];
+      let resultLetter = this.props.colorBlindMode ? this.props.resultNum : this.props.result.name.substr(0,3);
       return (
         <li className="result animated bounceInLeft mdl-list__item mdl-list__item--two-line" style={resultStyle}>
           <button onClick={() => this.props.onResultClick([this.props.result])} className="result-text mdl-list__item-primary-content mdl-button mdl-js-button">

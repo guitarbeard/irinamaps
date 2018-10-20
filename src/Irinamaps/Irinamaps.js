@@ -21,6 +21,96 @@ const COLORS = [
   '#8BC34A',
   '#FFC107',
   '#FF5722',
+  '#795548',
+  '#E91E63',
+  '#9C27B0',
+  '#3F51B5',
+  '#2196F3',
+  '#009688',
+  '#8BC34A',
+  '#FFC107',
+  '#FF5722',
+  '#795548',
+  '#E91E63',
+  '#9C27B0',
+  '#3F51B5',
+  '#2196F3',
+  '#009688',
+  '#8BC34A',
+  '#FFC107',
+  '#FF5722',
+  '#795548',
+  '#E91E63',
+  '#9C27B0',
+  '#3F51B5',
+  '#2196F3',
+  '#009688',
+  '#8BC34A',
+  '#FFC107',
+  '#FF5722',
+  '#795548',
+  '#E91E63',
+  '#9C27B0',
+  '#3F51B5',
+  '#2196F3',
+  '#009688',
+  '#8BC34A',
+  '#FFC107',
+  '#FF5722',
+  '#795548',
+  '#E91E63',
+  '#9C27B0',
+  '#3F51B5',
+  '#2196F3',
+  '#009688',
+  '#8BC34A',
+  '#FFC107',
+  '#FF5722',
+  '#795548',
+  '#E91E63',
+  '#9C27B0',
+  '#3F51B5',
+  '#2196F3',
+  '#009688',
+  '#8BC34A',
+  '#FFC107',
+  '#FF5722',
+  '#795548',
+  '#E91E63',
+  '#9C27B0',
+  '#3F51B5',
+  '#2196F3',
+  '#009688',
+  '#8BC34A',
+  '#FFC107',
+  '#FF5722',
+  '#795548',
+  '#E91E63',
+  '#9C27B0',
+  '#3F51B5',
+  '#2196F3',
+  '#009688',
+  '#8BC34A',
+  '#FFC107',
+  '#FF5722',
+  '#795548',
+  '#E91E63',
+  '#9C27B0',
+  '#3F51B5',
+  '#2196F3',
+  '#009688',
+  '#8BC34A',
+  '#FFC107',
+  '#FF5722',
+  '#795548',
+  '#E91E63',
+  '#9C27B0',
+  '#3F51B5',
+  '#2196F3',
+  '#009688',
+  '#8BC34A',
+  '#FFC107',
+  '#FF5722',
   '#795548'
 ];
 
@@ -59,6 +149,7 @@ const GoogleMapComponent = withGoogleMap(props => (
     defaultZoom={15}
     center={props.center}
     onZoomChanged={props.onZoomChanged}
+    onCenterChanged={props.onCenterChanged}
     mapTypeId={google.maps.MapTypeId.ROADMAP}
     zoom={props.zoom}
     bounds={props.bounds}
@@ -183,12 +274,14 @@ export default class Irinamaps extends Component {
               return index < limit;
             });
 
-            let iconColor = COLORS.filter(color => {
+            let usedColorIndex = 0;
+            let iconColor = COLORS.filter((color, index) => {
               if(usedColors.length === 0) {
-                return color;
+                return true;
               } else {
-                if(usedColors.indexOf(color) === -1) {
-                  return color;
+                if(usedColorIndex === 0 && usedColors.indexOf(index) === -1) {
+                  usedColorIndex = index;
+                  return true;
                 } else {
                   return false;
                 }
@@ -211,7 +304,8 @@ export default class Irinamaps extends Component {
             };
 
             results.push(newResult);
-            usedColors.push(iconColor);
+
+            usedColors.push(usedColorIndex);
           }
           // check if last result, else run again
           if(index === stateResults.length - 1){
@@ -291,19 +385,19 @@ export default class Irinamaps extends Component {
 
   handleResultDelete = (targetResult) => {
     let removedColor = false;
-    const nextResults = this.state.results.filter(result => {
+    const nextResults = this.state.results.filter((result, index) => {
       if (result === targetResult) {
         // remove color from usedColors
-        removedColor = result.color;
+        removedColor = index;
         return false;
       } else {
-        return result;
+        return true;
       }
     });
 
     this.setState(prevState => ({
       results: nextResults,
-      usedColors: prevState.usedColors.filter(color => color !== removedColor)
+      usedColors: prevState.usedColors.filter(colorIndex => colorIndex !== removedColor)
     }), this.setBounds);
   }
 
@@ -327,7 +421,7 @@ export default class Irinamaps extends Component {
   }
 
   zoomToUserLocation = () => {
-    if (this.state.userLocationMarker.length > 0) {
+    if (this.state.userLocationMarker.length) {
       this.setState({
         zoom: 15,
         center: this.state.userLocationMarker[0].position
@@ -397,12 +491,11 @@ export default class Irinamaps extends Component {
     }
   }
 
-  // handleBoundsChanged = () => {
-  //   this.setState({
-  //     bounds: this._map.getBounds(),
-  //     center: this._map.getCenter()
-  //   });
-  // }
+  handleCenterChanged = () => {
+    this.setState({
+      center: this._map.getCenter()
+    });
+  }
 
   handleZoomChanged = () => {
     this.setState({
@@ -443,13 +536,14 @@ export default class Irinamaps extends Component {
     const filteredPlaces = places.filter((value, index) => {
       return index < limit;
     });
-
-    let iconColor = COLORS.filter(color => {
+    let usedColorIndex = 0;
+    let iconColor = COLORS.filter((color, index) => {
       if(this.state.usedColors.length === 0) {
-        return color;
+        return true;
       } else {
-        if(this.state.usedColors.indexOf(color) === -1) {
-          return color;
+        if(usedColorIndex === 0 && this.state.usedColors.indexOf(index) === -1) {
+          usedColorIndex = index;
+          return true;
         } else {
           return false;
         }
@@ -459,7 +553,7 @@ export default class Irinamaps extends Component {
     iconColor = iconColor[0];
 
     // Add a marker for each place returned from search bar
-    const markers = filteredPlaces.map((place, index) => ({
+    const markers = filteredPlaces.map(place => ({
       position: place.geometry.location,
       iconColor,
       showInfo: false,
@@ -487,7 +581,7 @@ export default class Irinamaps extends Component {
 
     this.setState(prevState => ({
       results: _.flattenDeep([prevState.results, result]),
-      usedColors: _.flatten([prevState.usedColors, iconColor])
+      usedColors: _.flatten([prevState.usedColors, usedColorIndex])
     }));
 
     this._searchBox._inputElement.value = '';
@@ -497,14 +591,14 @@ export default class Irinamaps extends Component {
 
   handleMarkerDelete = (targetMarker) => {
     let removedColor = false;
-    const nextResults = this.state.results.filter(result => {
+    const nextResults = this.state.results.filter((result, index) => {
       if (result.color === targetMarker.iconColor) {
         result.markers = result.markers.filter(marker => marker !== targetMarker);
         if (result.markers.length) {
           return result;
         } else {
           // remove color from usedColors
-          removedColor = result.color;
+          removedColor = index;
           return false;
         }
       } else {
@@ -654,6 +748,7 @@ export default class Irinamaps extends Component {
               center={center}
               onMapLoad={this.handleMapMounted}
               onZoomChanged={this.handleZoomChanged}
+              onCenterChanged={this.handleCenterChanged}
               userLocationMarker={userLocationMarker}
               onMarkerDelete={this.handleMarkerDelete}
               onMarkerKeep={this.handleMarkerKeep}
