@@ -12,6 +12,8 @@ import InfoWindowContent from './InfoWindowContent';
 import NewLocationDialog from './NewLocationDialog';
 import RedoSearchRadio from './RedoSearchRadio'
 
+const MAX_SEARCH = 9;
+
 const COLORS = [
   '#E91E63',
   '#9C27B0',
@@ -22,96 +24,6 @@ const COLORS = [
   '#FFC107',
   '#FF5722',
   '#795548',
-  '#E91E63',
-  '#9C27B0',
-  '#3F51B5',
-  '#2196F3',
-  '#009688',
-  '#8BC34A',
-  '#FFC107',
-  '#FF5722',
-  '#795548',
-  '#E91E63',
-  '#9C27B0',
-  '#3F51B5',
-  '#2196F3',
-  '#009688',
-  '#8BC34A',
-  '#FFC107',
-  '#FF5722',
-  '#795548',
-  '#E91E63',
-  '#9C27B0',
-  '#3F51B5',
-  '#2196F3',
-  '#009688',
-  '#8BC34A',
-  '#FFC107',
-  '#FF5722',
-  '#795548',
-  '#E91E63',
-  '#9C27B0',
-  '#3F51B5',
-  '#2196F3',
-  '#009688',
-  '#8BC34A',
-  '#FFC107',
-  '#FF5722',
-  '#795548',
-  '#E91E63',
-  '#9C27B0',
-  '#3F51B5',
-  '#2196F3',
-  '#009688',
-  '#8BC34A',
-  '#FFC107',
-  '#FF5722',
-  '#795548',
-  '#E91E63',
-  '#9C27B0',
-  '#3F51B5',
-  '#2196F3',
-  '#009688',
-  '#8BC34A',
-  '#FFC107',
-  '#FF5722',
-  '#795548',
-  '#E91E63',
-  '#9C27B0',
-  '#3F51B5',
-  '#2196F3',
-  '#009688',
-  '#8BC34A',
-  '#FFC107',
-  '#FF5722',
-  '#795548',
-  '#E91E63',
-  '#9C27B0',
-  '#3F51B5',
-  '#2196F3',
-  '#009688',
-  '#8BC34A',
-  '#FFC107',
-  '#FF5722',
-  '#795548',
-  '#E91E63',
-  '#9C27B0',
-  '#3F51B5',
-  '#2196F3',
-  '#009688',
-  '#8BC34A',
-  '#FFC107',
-  '#FF5722',
-  '#795548',
-  '#E91E63',
-  '#9C27B0',
-  '#3F51B5',
-  '#2196F3',
-  '#009688',
-  '#8BC34A',
-  '#FFC107',
-  '#FF5722',
-  '#795548'
 ];
 
 const storageAvailable = function storageAvailable(type) {
@@ -153,7 +65,7 @@ const GoogleMapComponent = withGoogleMap(props => (
     mapTypeId={google.maps.MapTypeId.ROADMAP}
     zoom={props.zoom}
     bounds={props.bounds}
-    onClick={props.onMapClick}
+    onRightClick={props.onMapClick}
     options={{
       mapTypeControl:false,
       disableDefaultUI:true,
@@ -209,7 +121,7 @@ export default class Irinamaps extends Component {
       searchBounds: new google.maps.Circle({center: { lat: 33.690, lng: -117.887 }, radius: 30}).getBounds(),
       center: { lat: 33.690, lng: -117.887 },
       userLocationMarker: [],
-      usedColors: [],
+      remainingColors: COLORS,
       resultLimit: 10,
       results: [],
       zoom: 15,
@@ -250,7 +162,7 @@ export default class Irinamaps extends Component {
 
     if(this.state.redoSearch && this.state.results.length > 0) {
       let placesService = new google.maps.places.PlacesService(this._map.getMap());
-      let that = this, results = [], usedColors = [], stateResults = this.state.results, stateResultLimit = this.state.resultLimit;
+      let that = this, results = [], remainingColors = this.state.remainingColors, stateResults = this.state.results, stateResultLimit = this.state.resultLimit;
       let redoResultSearch = function redoResultSearch(index) {
         let result = stateResults[index];
         let center;
@@ -275,21 +187,7 @@ export default class Irinamaps extends Component {
               return index < limit;
             });
 
-            let usedColorIndex = 0;
-            let iconColor = COLORS.filter((color, index) => {
-              if(usedColors.length === 0) {
-                return true;
-              } else {
-                if(usedColorIndex === 0 && usedColors.indexOf(index) === -1) {
-                  usedColorIndex = index;
-                  return true;
-                } else {
-                  return false;
-                }
-              }
-            });
-
-            iconColor = iconColor[0];
+            let iconColor = remainingColors.shift();
             // Add a marker for each place returned from search bar
             const markers = filteredPlaces.map(place => ({
               position: place.geometry.location,
@@ -305,14 +203,12 @@ export default class Irinamaps extends Component {
             };
 
             results.push(newResult);
-
-            usedColors.push(usedColorIndex);
           }
           // check if last result, else run again
           if(index === stateResults.length - 1){
             that.setState({
               results,
-              usedColors,
+              remainingColors,
               isLoading: false
             }, callback);
           }else{
@@ -385,20 +281,18 @@ export default class Irinamaps extends Component {
   }
 
   handleResultDelete = (targetResult) => {
-    let removedColor = false;
-    const nextResults = this.state.results.filter((result, index) => {
+    let remainingColors = this.state.remainingColors;
+    const results = this.state.results.filter((result, index) => {
       if (result === targetResult) {
-        // remove color from usedColors
-        removedColor = index;
+        remainingColors.unshift(result.color);
         return false;
       } else {
         return true;
       }
     });
-
     this.setState(prevState => ({
-      results: nextResults,
-      usedColors: prevState.usedColors.filter(colorIndex => colorIndex !== removedColor)
+      results,
+      remainingColors
     }), this.setBounds);
   }
 
@@ -511,6 +405,7 @@ export default class Irinamaps extends Component {
 
   handlePlacesChanged = () => {
     const places = this._searchBox.getPlaces();
+    let remainingColors = this.state.remainingColors;
     if (!places.length) {
       this.setState({
         isSnackbarActive: true,
@@ -537,22 +432,8 @@ export default class Irinamaps extends Component {
     const filteredPlaces = places.filter((value, index) => {
       return index < limit;
     });
-    let usedColorIndex = 0;
-    let iconColor = COLORS.filter((color, index) => {
-      if(this.state.usedColors.length === 0) {
-        return true;
-      } else {
-        if(usedColorIndex === 0 && this.state.usedColors.indexOf(index) === -1) {
-          usedColorIndex = index;
-          return true;
-        } else {
-          return false;
-        }
-      }
-    });
 
-    iconColor = iconColor[0];
-
+    let iconColor = remainingColors.shift();
     // Add a marker for each place returned from search bar
     const markers = filteredPlaces.map(place => ({
       position: place.geometry.location,
@@ -567,8 +448,13 @@ export default class Irinamaps extends Component {
       markers: markers
     };
 
-    // the last search color is about to be used
-    if (this.state.usedColors.length === COLORS.length - 1) {
+    this.setState(prevState => ({
+      results: _.flattenDeep([prevState.results, result]),
+      remainingColors
+    }));
+
+    // no more colors left to use!
+    if (this.state.remainingColors.length === 0) {
       this.setState({
         isSnackbarActive: true,
         snackbarText: (
@@ -580,26 +466,20 @@ export default class Irinamaps extends Component {
       });
     }
 
-    this.setState(prevState => ({
-      results: _.flattenDeep([prevState.results, result]),
-      usedColors: _.flatten([prevState.usedColors, usedColorIndex])
-    }));
-
     this._searchBox._inputElement.value = '';
     this._searchBox._inputElement.blur();
     this.setBounds();
   }
 
   handleMarkerDelete = (targetMarker) => {
-    let removedColor = false;
-    const nextResults = this.state.results.filter((result, index) => {
+    let remainingColors = this.state.remainingColors;
+    const results = this.state.results.filter((result, index) => {
       if (result.color === targetMarker.iconColor) {
         result.markers = result.markers.filter(marker => marker !== targetMarker);
         if (result.markers.length) {
           return result;
         } else {
-          // remove color from usedColors
-          removedColor = index;
+          remainingColors.unshift(result.color);
           return false;
         }
       } else {
@@ -608,8 +488,8 @@ export default class Irinamaps extends Component {
     });
 
     this.setState(prevState => ({
-      results: nextResults,
-      usedColors: prevState.usedColors.filter(color => color !== removedColor)
+      results,
+      remainingColors
     }));
 
     this.setBounds();
@@ -710,10 +590,10 @@ export default class Irinamaps extends Component {
   }
 
   render() {
-    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText, redoSearch, colorBlindMode, usedColors, isLoading, initLocation, openModal, hideWelcome } = this.state;
+    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText, redoSearch, colorBlindMode, isLoading, initLocation, openModal, hideWelcome } = this.state;
     let showRedoSearch = userLocationMarker.length < 1 && results.length > 0;
     let loadingClassName = isLoading ? 'active' : '';
-    let maxSearchesClassName = usedColors.length === COLORS.length ? 'max-searches' : '';
+    let maxSearchesClassName = results.length === MAX_SEARCH ? 'max-searches' : '';
     return (
       <div className={maxSearchesClassName}>
         <div id="loading-overlay" className={loadingClassName}>

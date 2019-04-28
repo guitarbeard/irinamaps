@@ -167,6 +167,6 @@ html, body {
   }
 }
 
-.mdl-layout__obfuscator.is-visible {
-  opacity: 0;
+.mdl-layout__obfuscator {
+  display: none;
 }
