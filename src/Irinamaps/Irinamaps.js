@@ -786,7 +786,7 @@ export default class Irinamaps extends Component {
             role="dialog"
             parentSelector={() => document.body}>
             <h1>Welcome to Irinamaps<img src="/favicon-32x32.png" width="32" height="32" alt="Irinamaps"/></h1>
-            <p>The first tool that displays multiple search results in one map!</p>
+            <p>Finally, you can display multiple search results in one map!</p>
             <div className="text-right">
               <div id="welcome-toggle-wrap">
                 <Checkbox label="Don't Show Again" checked={hideWelcome} onChange={this.handleHideWelcome} />
