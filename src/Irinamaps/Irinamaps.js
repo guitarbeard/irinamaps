@@ -203,6 +203,7 @@ export default class Irinamaps extends Component {
     if (storageAvailable('localStorage')) {
       cachedHideWelcome = localStorage.getItem('hideWelcome') === 'true' ? true : false;
     }
+    ReactModal.setAppElement('#root');
     this.state = {
       bounds: new google.maps.Circle({center: { lat: 33.690, lng: -117.887 }, radius: 30}).getBounds(),
       searchBounds: new google.maps.Circle({center: { lat: 33.690, lng: -117.887 }, radius: 30}).getBounds(),
