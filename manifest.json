@@ -1,5 +1,8 @@
 {
     "name": "Irinamaps",
+    "short_name": "Irinamaps",
+    "start_url": "/",
+    "description": "Finally, you can display multiple search results in one map!",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
