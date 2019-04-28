@@ -15,8 +15,8 @@
             "type": "image/png"
         },
         {
-            "src": "/splash.png",
-            "sizes": "1242x2436",
+            "src": "/android-chrome-512x512.png",
+            "sizes": "512x512",
             "type": "image/png"
         }
     ],
