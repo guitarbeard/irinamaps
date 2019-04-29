@@ -20,6 +20,7 @@ export default class Sidebar extends Component {
           </div>
           <div id="color-blind-mode-wrap">
             <Checkbox label="Color Blind Mode" ripple checked={this.props.colorBlindMode} onChange={this.props.onColorBlindModeChange} />
+            <Checkbox label="Night Mode" ripple checked={this.props.nightMode} onChange={this.props.onNightModeChange} />
           </div>
         </div>
         <ul id="results-wrap" className='mdl-list'>

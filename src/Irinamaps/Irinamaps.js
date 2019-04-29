@@ -26,6 +26,87 @@ const COLORS = [
   '#795548',
 ];
 
+const NIGHT_MODE = [
+            {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
+            {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
+            {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
+            {
+              featureType: 'administrative.locality',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#d59563'}]
+            },
+            {
+              featureType: 'poi',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#d59563'}]
+            },
+            {
+              featureType: 'poi.park',
+              elementType: 'geometry',
+              stylers: [{color: '#263c3f'}]
+            },
+            {
+              featureType: 'poi.park',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#6b9a76'}]
+            },
+            {
+              featureType: 'road',
+              elementType: 'geometry',
+              stylers: [{color: '#38414e'}]
+            },
+            {
+              featureType: 'road',
+              elementType: 'geometry.stroke',
+              stylers: [{color: '#212a37'}]
+            },
+            {
+              featureType: 'road',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#9ca5b3'}]
+            },
+            {
+              featureType: 'road.highway',
+              elementType: 'geometry',
+              stylers: [{color: '#746855'}]
+            },
+            {
+              featureType: 'road.highway',
+              elementType: 'geometry.stroke',
+              stylers: [{color: '#1f2835'}]
+            },
+            {
+              featureType: 'road.highway',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#f3d19c'}]
+            },
+            {
+              featureType: 'transit',
+              elementType: 'geometry',
+              stylers: [{color: '#2f3948'}]
+            },
+            {
+              featureType: 'transit.station',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#d59563'}]
+            },
+            {
+              featureType: 'water',
+              elementType: 'geometry',
+              stylers: [{color: '#17263c'}]
+            },
+            {
+              featureType: 'water',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#515c6d'}]
+            },
+            {
+              featureType: 'water',
+              elementType: 'labels.text.stroke',
+              stylers: [{color: '#17263c'}]
+            }
+          ];
+
 const storageAvailable = function storageAvailable(type) {
   try {
     var storage = window[type],
@@ -51,8 +132,7 @@ const storageAvailable = function storageAvailable(type) {
 }
 
 const createMarkerIcon = function createMarkerIcon(text, fillColor) {
-  let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><path d="M19.39,1.562c-2.505-1.238-5.94-0.477-8.377,1.643C8.576,1.085,5.141,0.323,2.636,1.562 C-0.357,3.039-0.88,6.782,1.474,9.924l1.962,2.065l0.402,0.425l7.174,7.56l7.174-7.56l0.402-0.425l1.963-2.065 C22.906,6.782,22.383,3.039,19.39,1.562z" fill-opacity="1" stroke-opacity="0.5" stroke="#ffffff" fill="'+fillColor+'"></path><text x="8" y="14" font-family="Helvetica" font-size="11" stroke="none" fill="white">'+text+'</text></svg>';
-  return svg;
+  return  `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><path d="M19.39,1.562c-2.505-1.238-5.94-0.477-8.377,1.643C8.576,1.085,5.141,0.323,2.636,1.562 C-0.357,3.039-0.88,6.782,1.474,9.924l1.962,2.065l0.402,0.425l7.174,7.56l7.174-7.56l0.402-0.425l1.963-2.065 C22.906,6.782,22.383,3.039,19.39,1.562z" fill-opacity="1" stroke-width="1" stroke="#ffffff" fill="${fillColor}"></path><text x="8" y="14" font-family="Helvetica" font-size="11" stroke="none" fill="white">${text}</text></svg>`;
 }
 
 const GoogleMapComponent = withGoogleMap(props => (
@@ -67,6 +147,7 @@ const GoogleMapComponent = withGoogleMap(props => (
     bounds={props.bounds}
     onRightClick={props.onMapClick}
     options={{
+      styles: props.nightMode,
       mapTypeControl:false,
       disableDefaultUI:true,
       zoomControl:true,
@@ -98,7 +179,7 @@ const GoogleMapComponent = withGoogleMap(props => (
         <Marker icon={icon} position={marker.position} key={index} onClick={() => props.onMarkerClick(marker)}>
           {marker.showInfo && (
             <InfoWindow onCloseClick={() => props.onMarkerClose(marker)}>
-              <InfoWindowContent onMarkerKeep={() => props.onMarkerKeep(marker)} onMarkerDelete={() => props.onMarkerDelete(marker)} place={marker.place} />
+              <InfoWindowContent onMarkerKeep={() => props.onMarkerKeep(marker)} onMarkerDelete={() => props.onMarkerDelete(marker)} place={marker.place} result={result} />
             </InfoWindow>
           )}
         </Marker>
@@ -131,6 +212,7 @@ export default class Irinamaps extends Component {
       isLoading: true,
       initLocation: false,
       colorBlindMode: false,
+      nightMode: false,
       openModal: cachedHideWelcome ? false : true,
       hideWelcome: cachedHideWelcome
     }
@@ -162,7 +244,8 @@ export default class Irinamaps extends Component {
 
     if(this.state.redoSearch && this.state.results.length > 0) {
       let placesService = new google.maps.places.PlacesService(this._map.getMap());
-      let that = this, results = [], remainingColors = this.state.remainingColors, stateResults = this.state.results, stateResultLimit = this.state.resultLimit;
+      let that = this, results = [], stateResults = this.state.results, stateResultLimit = this.state.resultLimit;
+
       let redoResultSearch = function redoResultSearch(index) {
         let result = stateResults[index];
         let center;
@@ -186,19 +269,17 @@ export default class Irinamaps extends Component {
             const filteredPlaces = places.filter((value, index) => {
               return index < limit;
             });
-
-            let iconColor = remainingColors.shift();
             // Add a marker for each place returned from search bar
             const markers = filteredPlaces.map(place => ({
               position: place.geometry.location,
-              iconColor,
+              iconColor: result.color,
               showInfo: false,
               place
             }));
 
             const newResult = {
               name: result.name,
-              color: iconColor,
+              color: result.color,
               markers: markers
             };
 
@@ -208,7 +289,6 @@ export default class Irinamaps extends Component {
           if(index === stateResults.length - 1){
             that.setState({
               results,
-              remainingColors,
               isLoading: false
             }, callback);
           }else{
@@ -570,6 +650,10 @@ export default class Irinamaps extends Component {
     this.setState({ colorBlindMode: event.target.checked });
   }
 
+  handleNightMode = (event) => {
+    this.setState({ nightMode: event.target.checked });
+  }
+
   handleTimeoutSnackbar = () => {
     this.setState({ isSnackbarActive: false });
   }
@@ -590,7 +674,7 @@ export default class Irinamaps extends Component {
   }
 
   render() {
-    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText, redoSearch, colorBlindMode, isLoading, initLocation, openModal, hideWelcome } = this.state;
+    const { results, resultLimit, zoom, center, userLocationMarker, bounds, searchBounds, isSnackbarActive, snackbarText, redoSearch, colorBlindMode, isLoading, initLocation, openModal, hideWelcome, nightMode } = this.state;
     let showRedoSearch = userLocationMarker.length < 1 && results.length > 0;
     let loadingClassName = isLoading ? 'active' : '';
     let maxSearchesClassName = results.length === MAX_SEARCH ? 'max-searches' : '';
@@ -613,6 +697,8 @@ export default class Irinamaps extends Component {
               onResultClick={this.setBounds}
               onResultDelete={this.handleResultDelete}
               onColorBlindModeChange={this.handleColorBlindMode}
+              nightMode={nightMode}
+              onNightModeChange={this.handleNightMode}
               colorBlindMode={colorBlindMode}
             />
           </Drawer>
@@ -627,6 +713,7 @@ export default class Irinamaps extends Component {
               results={results}
               zoom={zoom}
               center={center}
+              nightMode={nightMode ? NIGHT_MODE : []}
               onMapLoad={this.handleMapMounted}
               onZoomChanged={this.handleZoomChanged}
               onCenterChanged={this.handleCenterChanged}

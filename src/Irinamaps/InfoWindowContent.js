@@ -39,7 +39,7 @@ export default class InfoWindowContent extends Component {
     return (
       <div className="info-window">
         {photo}
-        <strong>{this.props.place.name}</strong>
+        <strong>{this.props.place.name === '' ? this.props.result.name : this.props.place.name}</strong>
         <address>
           {this.props.place.formatted_address}
           {openNow}
