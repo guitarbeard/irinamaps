@@ -13,17 +13,27 @@
 .btn-cancel {
   background-color: #d9534f;
   color: white;
+  &:hover, &:focus, &:focus:not(:active) {
+    background-color: transparentize(#d9534f, 0.5);
+  }
 }
 
 .btn-ok {
   background-color: #5cb85c;
   color: white;
+  &:hover, &:focus, &:focus:not(:active) {
+    background-color: transparentize(#5cb85c, 0.5);
+  }
 }
 
 .btn-directions {
+  background-color: #fafafa;
   margin-top: 5px;
   width: 192px;
   padding: 0;
+  &:hover, &:focus, &:focus:not(:active) {
+    background-color: transparentize(#fafafa, 0.5);
+  }
 }
 
 .info-window {

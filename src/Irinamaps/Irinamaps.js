@@ -702,7 +702,7 @@ export default class Irinamaps extends Component {
               colorBlindMode={colorBlindMode}
             />
           </Drawer>
-          <Content>
+          <Content className={this.state.nightMode ? 'night-mode' : ''}>
             <GoogleMapComponent
               containerElement={
                 <div style={{ height: `100%` }} />

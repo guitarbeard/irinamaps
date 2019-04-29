@@ -10,6 +10,10 @@ html, body {
   width: 100%;
 }
 
+.gm-style-iw-d {
+  overflow: inherit!important;
+}
+
 .ReactModalPortal {
   position: fixed;
   z-index: 10;

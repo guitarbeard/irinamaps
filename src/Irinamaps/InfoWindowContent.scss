@@ -1,6 +1,26 @@
+.night-mode {
+  .gm-style {
+    .gm-style-iw-t {
+      &::after {
+        background: #566271;
+      }
+      img {
+        filter: invert(1);
+      }
+      .gm-style-iw {
+        background: #566271;
+      }
+    }
+  }
+  .info-window {
+    color: white;
+  }
+}
+
 .info-window {
   clear: both;
   max-width: 195px;
+  padding: 10px 10px 15px 0;
   .mdl-radio__label {
     font-size: 11px;
   }
