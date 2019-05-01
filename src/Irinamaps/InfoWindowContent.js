@@ -13,7 +13,7 @@ export default class InfoWindowContent extends Component {
         __html: this.props.place.photos[0].html_attributions[0]
       };
       photo = (
-        <div>
+        <div className="place-img-wrap">
           <div className="place-img" style={img} />
           <span className="attribution" dangerouslySetInnerHTML={imgAttribution} />
           <br />

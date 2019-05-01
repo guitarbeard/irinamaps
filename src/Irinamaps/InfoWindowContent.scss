@@ -51,4 +51,10 @@
   address {
     line-height: 1.3;
   }
+  @media (max-height: 470px) {
+    .place-img-wrap {
+      display: none;
+    }
+    padding-top: 0;
+  }
 }

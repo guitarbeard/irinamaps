@@ -377,17 +377,25 @@ export default class Irinamaps extends Component {
   }
 
   handleResultLimitChange = (e) => {
-    if (e.target.value <= 20) {
+    let tooBig = false, tooSmall = false;
+    if(e.target.value > 20) {
+      tooBig = true;
+    }
+    if(e.target.value <= 0){
+      tooSmall = true;
+    }
+    if (!tooBig && !tooSmall) {
       this.setState({
         resultLimit: e.target.value
       });
     } else {
+      let resultLimit = tooSmall ? 1 : 20;
       this.setState({
-        resultLimit: 20,
+        resultLimit,
         isSnackbarActive: true,
         snackbarText: (
           <div>
-            Max result limit is 20
+            {tooSmall ? 'Min' : 'Max' } result limit is {resultLimit}
             <i className="material-icons">warning</i>
           </div>
         )
@@ -754,7 +762,7 @@ export default class Irinamaps extends Component {
             role="dialog"
             parentSelector={() => document.body}>
             <h1>Welcome to Irinamaps<img src="/favicon-32x32.png" width="32" height="32" alt="Irinamaps"/></h1>
-            <p>Finally, you can display multiple search results in one map!</p>
+            <p>The easy way to display multiple search results on one map!</p>
             <div className="text-right">
               <div id="welcome-toggle-wrap">
                 <Checkbox label="Don't Show Again" checked={hideWelcome} onChange={this.handleHideWelcome} />

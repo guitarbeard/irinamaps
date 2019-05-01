@@ -16,6 +16,7 @@ export default class Sidebar extends Component {
               label="Max"
               floatingLabel
               value={this.props.resultLimit}
+              type="number"
             />
           </div>
           <div id="color-blind-mode-wrap">
