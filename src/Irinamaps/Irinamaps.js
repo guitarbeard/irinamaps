@@ -704,6 +704,8 @@ export default class Irinamaps extends Component {
               onResultLimitChange={this.handleResultLimitChange}
               onResultClick={this.setBounds}
               onResultDelete={this.handleResultDelete}
+              onMarkerClick={this.handleMarkerClick}
+              onMarkerDelete={this.handleMarkerDelete}
               onColorBlindModeChange={this.handleColorBlindMode}
               nightMode={nightMode}
               onNightModeChange={this.handleNightMode}

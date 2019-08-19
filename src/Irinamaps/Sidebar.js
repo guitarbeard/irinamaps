@@ -26,7 +26,7 @@ export default class Sidebar extends Component {
         </div>
         <ul id="results-wrap" className='mdl-list'>
         {this.props.results.map((result, index) => (
-          <Result resultNum={index + 1} colorBlindMode={this.props.colorBlindMode} result={result} key={index} onResultClick={this.props.onResultClick} onResultDelete={this.props.onResultDelete} />
+          <Result resultNum={index + 1} colorBlindMode={this.props.colorBlindMode} result={result} key={index} onResultClick={this.props.onResultClick} onResultDelete={this.props.onResultDelete} onMarkerClick={this.props.onMarkerClick} onMarkerDelete={this.props.onMarkerDelete} />
         ))}
         </ul>
       </div>
