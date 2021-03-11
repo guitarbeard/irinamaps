@@ -41,7 +41,7 @@
     "postcss-loader": "1.0.0",
     "promise": "7.1.1",
     "raw-loader": "^0.5.1",
-    "react-dev-utils": "^0.4.2",
+    "react-dev-utils": "^11.0.4",
     "react-modal": "^3.8.1",
     "recursive-readdir": "2.1.0",
     "sass-loader": "^4.1.1",
